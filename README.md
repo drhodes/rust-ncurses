@@ -9,7 +9,7 @@ Hello world is working on linux x86
 
 $ rustc --bin ncurses.rc --test && ./ncurses
 
-#[test]
+<pre>
 fn hello() {
     ncurses::initscr();       // Start curses mode  
     printw("Hello World!");
@@ -18,3 +18,4 @@ fn hello() {
     ncurses::getch();         // Wait for user input 
     ncurses::endwin();        // End curses mode 
 }
+</pre>
