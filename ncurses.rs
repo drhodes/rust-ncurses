@@ -364,17 +364,18 @@ native mod ncurses {
 
 }
 
+fn printw(s: str) {
+    str::as_c_str(s, ncurses::printw);
+}
+
 #[test]
 fn hello() {
-    let win = ncurses::initscr();/* Start curses mode   */
-
-    str::as_c_str("Hello World !!!", ncurses::printw);
+    ncurses::initscr();/* Start curses mode   */
+    printw("Hello World !!!");
 
     ncurses::refresh();/* Print it on to the real screen */
     ncurses::getch();/* Wait for user input */
     ncurses::endwin();/* End curses mode  */
-    
-    log(error, "Hi")
 }
 
 
