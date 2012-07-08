@@ -1,5 +1,12 @@
+// documentation strings are derived work licensed under
+// PSF LICENSE AGREEMENT FOR PYTHON 2.7.3, found in python-license.txt
+
+// Copyright 2012 Derek A. Rhodes.  All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
 
 class Window {
+    // meditate on how to more safely deal with this potential null pointer 
     let win: *WINDOW;
     
     new() {
