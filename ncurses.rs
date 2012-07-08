@@ -1,19 +1,13 @@
 // Copyright 2012 Derek A. Rhodes.  All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
+// 
 
 use std;
 import libc::*;
 import io;
 import str::unsafe;
 import result::{result, ok, err};
-
-enum PANEL{}
-enum WINDOW{}
-enum SCREEN{}
-//enum chtype{}
-enum _nc_eventlist{}
-
 
 enum NCURSES_ATTR_T {
       NORMAL,
@@ -37,6 +31,11 @@ enum NCURSES_ATTR_T {
       VERTICAL,
 }
 
+enum PANEL{}
+enum WINDOW{}
+enum SCREEN{}
+//enum chtype{}
+enum _nc_eventlist{}
 enum attr_t{}
 enum ctype{}
 enum mmask_t{}
@@ -48,17 +47,18 @@ enum va_list{}
 type chtype = u32;
 
 native mod ncurses {
-    //extern NCURSES_EXPORT_VAR(chtype) acs_map[];
 
-    
+
+
+    //extern NCURSES_EXPORT_VAR(chtype) acs_map[];  
     //fn wgetch_events (win: *WINDOW, nc: *_nc_eventlist) -> c_int; 
     //fn wgetnstr_events (win: *WINDOW, c: *char, n: c_int, nc: *_nc_eventlist); 
 
-    fn addch (c: chtype) -> c_int; 
+    fn addch (ch: chtype) -> c_int; 
     fn addchnstr (c: *chtype, n1: c_int) -> c_int; 
     fn addchstr (c: *chtype) -> c_int; 
     fn addnstr (c: *char, n1: c_int) -> c_int; 
-    fn addstr (c: *char) -> c_int; 
+    fn addstr (c: *c_char) -> c_int; 
     fn attroff (nc: NCURSES_ATTR_T) -> c_int; 
     fn attron (nc: NCURSES_ATTR_T) -> c_int; 
 //    fn attrset (nc: NCURSES_ATTR_T) -> c_int; 
@@ -67,26 +67,19 @@ native mod ncurses {
     fn attr_off (at0: attr_t, v1: *c_void) -> c_int; 
     fn attr_on (at0: attr_t, v1: *c_void) -> c_int; 
     fn attr_set (at0: attr_t, s1: c_short, v2: *c_void) -> c_int; 
-//    fn baudrate (v: c_void) -> c_int; 
     fn baudrate () -> c_int; 
-//    fn beep  (v: c_void) -> c_int; 
     fn beep  () -> c_int; 
     fn bkgd (ch0: ctype) -> c_int; 
     fn bkgdset (ch0: ctype) -> c_void; 
     fn border (c1: chtype, c2: chtype, c3: chtype, c4: chtype, 
                c5: chtype, c6: chtype, c7: chtype, c8: chtype) -> c_int; 
     fn box (win: *WINDOW, c1: chtype, c2: chtype) -> c_int; 
-//    fn can_change_color (v: c_void) -> bool; 
     fn can_change_color () -> bool; 
-//    fn cbreak (v: c_void) -> c_int; 
     fn cbreak () -> c_int; 
     fn chgat (n: c_int, at2: attr_t, s2: c_short, v3: *c_void) -> c_int; 
-//    fn clear (v: c_void) -> c_int; 
     fn clear () -> c_int; 
     fn clearok (win: *WINDOW, b: bool) -> c_int; 
-//    fn clrtobot (v: c_void) -> c_int; 
     fn clrtobot () -> c_int; 
-//    fn clrtoeol (v: c_void) -> c_int; 
     fn clrtoeol () -> c_int; 
     fn color_content (s0: c_short, s1: *c_short, s2: *c_short, s3: *c_short) -> c_int; 
     fn color_set (s0: c_short, v1: *c_void) -> c_int; 
@@ -94,62 +87,41 @@ native mod ncurses {
     fn copywin (win0: *WINDOW, win1: *WINDOW, c2: c_int, c3: c_int, c4: c_int,
                 c5: c_int, c6: c_int, c7: c_int, c8: c_int) -> c_int; 
     fn curs_set (n0: c_int) -> c_int; 
-//    fn def_prog_mode (v: c_void) -> c_int; 
     fn def_prog_mode () -> c_int; 
-//    fn def_shell_mode (v: c_void) -> c_int; 
     fn def_shell_mode () -> c_int; 
     fn delay_output (n0: c_int) -> c_int; 
-//    fn delch (v: c_void) -> c_int; 
     fn delch () -> c_int; 
     fn delscreen (scr: *SCREEN) -> c_void; 
     fn delwin (win: *WINDOW) -> c_int; 
-//    fn deleteln (v: c_void) -> c_int; 
     fn deleteln () -> c_int; 
     fn derwin (win: *WINDOW, n1: c_int, n2: c_int, n3: c_int, n4: c_int) -> *WINDOW; 
-//    fn doupdate (v: c_void) -> c_int; 
     fn doupdate () -> c_int; 
     fn dupwin (win: *WINDOW) ->*WINDOW; 
-//    fn echo (v: c_void) -> c_int; 
     fn echo () -> c_int; 
     fn echochar (ch0: ctype) -> c_int; 
-//    fn erase (v: c_void) -> c_int; 
     fn erase () -> c_int; 
-//    //fn endwin (v: c_void) -> c_int; 
-    //fn endwin () -> c_int; 
     fn endwin () -> c_int; 
-//    fn erasechar (v: c_void) -> char; 
     fn erasechar () -> char; 
-//    fn filter (v: c_void) -> c_void; 
     fn filter () -> c_void; 
-//    fn flash (v: c_void) -> c_int; 
     fn flash () -> c_int; 
-//    fn flushinp (v: c_void) -> c_int; 
     fn flushinp () -> c_int; 
     fn getbkgd (win: *WINDOW) -> chtype; 
-//    //fn getch (v: c_void) -> c_int; 
-    //fn getch () -> c_int; 
     fn getch () -> c_int; 
     fn getnstr (c: *char, n1: c_int) -> c_int; 
     fn getstr (c: *char) -> c_int; 
     // -----------------------------------------------------------------------------
     fn getwin (f: *FILE) ->*WINDOW; 
     fn halfdelay (n0: c_int) -> c_int; 
-//    fn has_colors (v: c_void) -> bool; 
     fn has_colors () -> bool; 
-//    fn has_ic (v: c_void) -> bool; 
     fn has_ic () -> bool; 
-//    fn has_il (v: c_void) -> bool; 
     fn has_il () -> bool; 
     fn hline (ch0: ctype, n1: c_int) -> c_int; 
     fn idcok (win: *WINDOW, b1: bool) -> c_void; 
     fn idlok (win: *WINDOW, b1: bool) -> c_int; 
     fn immedok (win: *WINDOW, b1: bool) -> c_void; 
-//    fn inch (v: c_void) -> chtype; 
     fn inch () -> chtype; 
     fn inchnstr (ch0: *chtype, n1: c_int) -> c_int; 
     fn inchstr (ch0: *chtype) -> c_int; 
-//    //fn initscr (v: c_void) ->*WINDOW; 
-    //fn initscr () ->*WINDOW; 
     fn initscr () ->*WINDOW; 
 
     fn init_color (s0: c_short, s1: c_short, s2: c_short, s3: c_short) -> c_int; 
@@ -157,22 +129,18 @@ native mod ncurses {
     fn innstr (c: *char, n1: c_int) -> c_int; 
     fn insch (ch0: ctype) -> c_int; 
     fn insdelln (n0: c_int) -> c_int; 
-//    fn insertln (v: c_void) -> c_int; 
     fn insertln () -> c_int; 
     fn insnstr (c: *char, n1: c_int) -> c_int; 
     fn insstr (c: *char) -> c_int; 
     fn instr (c: *char) -> c_int; 
     fn intrflush (win: *WINDOW, b1: bool) -> c_int; 
-//    fn isendwin (v: c_void) -> bool; 
     fn isendwin () -> bool; 
     fn is_linetouched (win: *WINDOW, n1: c_int) -> bool; 
     fn is_wintouched (win: *WINDOW) -> bool; 
     fn keyname (n0: c_int) -> *char; 
     fn keypad (win: *WINDOW, b1: bool) -> c_int; 
-//    fn killchar (v: c_void) -> char; 
     fn killchar () -> char; 
     fn leaveok (win: *WINDOW, b1: bool) -> c_int; 
-//    fn longname (v: c_void) ->*char; 
     fn longname () ->*char; 
     fn meta (win: *WINDOW, b1: bool) -> c_int; 
     fn move (n0: c_int, n1: c_int) -> c_int; 
@@ -229,18 +197,12 @@ native mod ncurses {
     fn newpad (n0: c_int, n1: c_int) -> *WINDOW; 
     fn newterm (c: *char, f1: *FILE, f2: *FILE) -> *SCREEN; 
     fn newwin (n0: c_int, n1: c_int, c2: c_int, c3: c_int) -> *WINDOW; 
-//    fn nl (v: c_void) -> c_int; 
     fn nl () -> c_int; 
-//    fn nocbreak (v: c_void) -> c_int; 
     fn nocbreak () -> c_int; 
     fn nodelay (win: *WINDOW, b1: bool) -> c_int; 
-//    fn noecho (v: c_void) -> c_int; 
     fn noecho () -> c_int; 
-//    fn nonl (v: c_void) -> c_int; 
     fn nonl () -> c_int; 
-//    fn noqiflush (v: c_void) -> c_void; 
     fn noqiflush () -> c_void; 
-//    fn noraw (v: c_void) -> c_int; 
     fn noraw () -> c_int; 
     fn notimeout (win: *WINDOW, b1: bool) -> c_int; 
     fn overlay (win0: *WINDOW, win: *WINDOW) -> c_int; 
@@ -256,22 +218,14 @@ native mod ncurses {
 
     //fn prc_intw (c: *char一...) 
     // fn extern NCURSES_EXPORT(n0: c_int) putwin (win: *WINDOW一*FILE) -> c_int; 
-//    fn qiflush (v: c_void) -> c_void; 
     fn qiflush () -> c_void; 
-//    fn raw (v: c_void) -> c_int; 
     fn raw () -> c_int; 
     fn redrawwin (win: *WINDOW) -> c_int; 
-//    //fn refresh (v: c_void) -> c_int; 
-    //fn refresh () -> c_int; 
     fn refresh () -> c_int; 
-//    fn resetty (v: c_void) -> c_int; 
     fn resetty () -> c_int; 
-//    fn reset_prog_mode (v: c_void) -> c_int; 
     fn reset_prog_mode () -> c_int; 
-//    fn reset_shell_mode (v: c_void) -> c_int; 
     fn reset_shell_mode () -> c_int; 
     //fn ripoffline (n0: c_int, n1: c_int (*)(win: *WINDOW, c2: c_int)) -> c_int;  todo function ptr fun fun fun
-//    fn savetty (v: c_void) -> c_int; 
     fn savetty () -> c_int; 
     //fn scanw (NCURSES_*char一...) 
     // fn extern NCURSES_EXPORT(n0: c_int) scr_dump (c: *char) -> c_int; 
@@ -288,35 +242,24 @@ native mod ncurses {
     fn slk_attron (ch0: ctype) -> c_int; 
     //fn slk_attr_on (at0: attr_t, v1: *c_void) -> c_int; 
     fn slk_attrset (ch0: ctype) -> c_int; 
-//    fn slk_attr (v: c_void) -> attr_t; 
     fn slk_attr () -> attr_t; 
     fn slk_attr_set (at0: attr_t, s1: c_short, v2: *c_void) -> c_int; 
-//    fn slk_clear (v: c_void) -> c_int; 
     fn slk_clear () -> c_int; 
     fn slk_color (s0: c_short) -> c_int; 
     fn slk_init (n0: c_int) -> c_int; 
     fn slk_label (n0: c_int) -> *char; 
-//    fn slk_noutrefresh (v: c_void) -> c_int; 
     fn slk_noutrefresh () -> c_int; 
-//    fn slk_refresh (v: c_void) -> c_int; 
     fn slk_refresh () -> c_int; 
-//    fn slk_restore (v: c_void) -> c_int; 
     fn slk_restore () -> c_int; 
     fn slk_set (n0: c_int, c1: *char, c2: c_int) -> c_int; 
-//    fn slk_touch (v: c_void) -> c_int; 
     fn slk_touch () -> c_int; 
-//    fn standout (v: c_void) -> c_int; 
     fn standout () -> c_int; 
-//    fn standend (v: c_void) -> c_int; 
     fn standend () -> c_int; 
-//    fn start_color (v: c_void) -> c_int; 
     fn start_color () -> c_int; 
     fn subpad (win: *WINDOW, n1: c_int, c2: c_int, c3: c_int, n4: c_int) -> *WINDOW; 
     fn subwin (win: *WINDOW, n1: c_int, c2: c_int, c3: c_int, n4: c_int) -> *WINDOW; 
     fn syncok (win: *WINDOW, b1: bool) -> c_int; 
-//    fn termattrs (v: c_void) -> chtype; 
     fn termattrs () -> chtype; 
-//    fn termname (v: c_void) -> *char; 
     fn termname () -> *char; 
     fn timeout (n0: c_int) -> c_void; 
     fn touchline (win: *WINDOW, n1: c_int, c2: c_int) -> c_int; 
@@ -408,11 +351,9 @@ native mod ncurses {
     fn getpary (win: *WINDOW) -> c_int; 
     fn is_term_resized (n0: c_int, n1: c_int) -> bool; 
     // dup fn keybound (n0: c_int, n1: c_int) -> *char; 
-//    fn curses_version (v: c_void) -> *char; 
     fn curses_version () -> *char; 
     fn assume_default_colors (n0: c_int, n1: c_int) -> c_int; 
     fn define_key (c: *char, n1: c_int) -> c_int; 
-//    fn get_escdelay (v: c_void) -> c_int; 
     fn get_escdelay () -> c_int; 
     fn key_defined (c: *char) -> c_int; 
     fn keyok (n0: c_int, b1: bool) -> c_int; 
@@ -420,14 +361,12 @@ native mod ncurses {
     fn resizeterm (n0: c_int, n1: c_int) -> c_int; 
     fn set_escdelay (n0: c_int) -> c_int; 
     fn set_tabsize (n0: c_int) -> c_int; 
-//    fn use_default_colors (v: c_void) -> c_int; 
     fn use_default_colors () -> c_int; 
     fn use_extended_names (b0: bool) -> c_int; 
     fn use_legacy_coding (n0: c_int) -> c_int; 
     fn use_screen (scr0: *SCREEN, c1: SCREEN_CB, v2: *c_void) -> c_int; 
     fn use_window (win: *WINDOW, c1: WINDOW_CB, v2: *c_void) -> c_int; 
     fn wresize (win: *WINDOW, n1: c_int, c2: c_int) -> c_int; 
-//    fn nofilter(v: c_void) -> c_void; 
     fn nofilter() -> c_void; 
     fn wgetparent (win: *WINDOW) -> *WINDOW; 
     fn is_cleared (win: *WINDOW) -> bool; 
@@ -523,25 +462,25 @@ fn attrset(at: NCURSES_ATTR_T) -> int {
       TOP        { 536870912 }
       VERTICAL   { 1073741824 }
     };
-    log(error, val);
     //ret ncurses::attrset(val as c_int) as int
     ret ncurses::attrset(val as c_int) as int
 }
 
-#[test]
-fn hello() {
-    ncurses::initscr();/* Start curses mode   */
+// #[test]
+// fn hello() {
+//     ncurses::initscr();/* Start curses mode   */
 
-    attrset(BOLD);
-    printw("Hello");
+//     attrset(BOLD);
+//     printw("Hello");
         
-    attrset(REVERSE);
-    printw(" World !!!");
+//     attrset(REVERSE);
+//     printw(" World !!!");
 
-    ncurses::refresh();/* Print it on to the real screen */
-    ncurses::getch();/* Wait for user input */
-    ncurses::endwin();/* End curses mode  */
-}
+//     ncurses::refresh();/* Print it on to the real screen */
+//     ncurses::getch();/* Wait for user input */
+//     ncurses::endwin();/* End curses mode  */
+// }
+
 
 #[test]
 fn voidsuite() {
@@ -625,7 +564,6 @@ fn voidsuite() {
 
 
 // there repeats here, consider modularizing these by first arg.
-////     fn new_prescr (v: c_void) -> *SCREEN; 
 //     fn new_prescr () -> *SCREEN; 
 //     fn baudrate (scr0: *SCREEN) -> c_int; 
 //     fn beep (scr0: *SCREEN) -> c_int; 
@@ -756,4 +694,6 @@ fn voidsuite() {
 //     // fn extern NCURSES_EXPORT_VAR(n0: c_int) _nc_optimize_enable; 
 //     fn _nc_visbuf (c: *char) -> *char; 
 // } 
+
+
 
