@@ -7,7 +7,7 @@ Hello World
 
 Hello world is working on linux x86
 
-$ rustc --bin ncurses.rc --test && ./ncurses
+$ make test
 
 <pre>
 fn hello() {
