@@ -48,8 +48,8 @@ class Window {
     // window.addstr([y, x], str[, attr])¶
     #[doc = "Paint the string str at (y, x) with attributes attr, overwriting \
              anything previously on the display."]
-    fn addstr(y: int, x: int, s: str) {
-        self.move(y, x);        
+    fn addstr(y: int, x: int, s: ~str) {
+        self.mv(y, x);        
         str::as_c_str(s, {|x| ncurses::addstr(x)});
     }
 
@@ -340,7 +340,7 @@ class Window {
 
     // -----------------------------------------------------------------------------
     #[doc = "Move cursor to (new_y, new_x)."]
-    fn move (y: int, x: int) -> int {
+    fn mv (y: int, x: int) -> int {
         ncurses::wmove(self.win, y as c_int, x as c_int) as int
     }
 
@@ -540,11 +540,11 @@ fn hello2() {
     let win = Window();
 
     win.attrset(A_BOLD);
-    win.addstr(1, 1, "你好 Hello");
+    win.addstr(1, 1, ~"你好 Hello");
 
-    for [2,3,4,5,6,7,8,9].each {|n|
+    for [2,3,4,5,6,7,8,9].each |n|{
         attrset(REVERSE);
-        win.addstr(n, n*2, " World !!!");
+        win.addstr(n, n*2, ~" World !!!");
         ncurses::refresh();/* Print it on to the real screen */
     }
     ncurses::getch();/* Wait for user input */

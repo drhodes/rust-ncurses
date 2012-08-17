@@ -46,10 +46,7 @@ enum MEVENT{}
 enum va_list{}
 type chtype = u32;
 
-native mod ncurses {
-
-
-
+extern mod ncurses {
     //extern NCURSES_EXPORT_VAR(chtype) acs_map[];  
     //fn wgetch_events (win: *WINDOW, nc: *_nc_eventlist) -> c_int; 
     //fn wgetnstr_events (win: *WINDOW, c: *char, n: c_int, nc: *_nc_eventlist); 
@@ -143,7 +140,13 @@ native mod ncurses {
     fn leaveok (win: *WINDOW, b1: bool) -> c_int; 
     fn longname () ->*char; 
     fn meta (win: *WINDOW, b1: bool) -> c_int; 
-    fn move (n0: c_int, n1: c_int) -> c_int; 
+
+    // rust keyworkd "move" shadows this function name
+    // fn move (n0: c_int, n1: c_int) -> c_int;  
+
+    #[link_name = "move"]
+    fn mv (n0: c_int, n1: c_int) -> c_int;  
+
     fn mvaddch (n0: c_int, n1: c_int, c2: chtype) -> c_int; 
     fn mvaddchnstr (n0: c_int, n1: c_int, ch2: *chtype, c3: c_int) -> c_int; 
     fn mvaddchstr (n0: c_int, n1: c_int, ch2: *chtype) -> c_int; 
@@ -385,7 +388,7 @@ native mod ncurses {
 
 }
 
-fn printw(s: str) {
+fn printw(s: ~str) {
     str::as_c_str(s, ncurses::printw);
 }
 
@@ -441,29 +444,29 @@ fn attrset(at: NCURSES_ATTR_T) -> int {
     // ones marked 'good' are known to work
     // others are not known to work 
 
-    let val = alt at {
-      NORMAL     { 0 }
-      ATTRIBUTES { 4294967040 }
-      CHARTEXT   { 255 } 
-      COLOR      { 65280 }
-      STANDOUT   { 65536 } // good
-      UNDERLINE  { 131072 } // good
-      REVERSE    { 262144 } // good
-      BLINK      { 524288 } 
-      DIM        { 1048576 }
-      BOLD       { 2097152 } // good
-      ALTCHARSET { 4194304 }
-      INVIS      { 8388608 } // good
-      PROTECT    { 16777216 }
-      HORIZONTAL { 33554432 }
-      LEFT       { 67108864 }
-      LOW        { 134217728 }
-      RIGHT      { 268435456 }
-      TOP        { 536870912 }
-      VERTICAL   { 1073741824 }
+    let val = match at {
+      NORMAL     => 0,
+      ATTRIBUTES => 4294967040,
+      CHARTEXT   => 255, 
+      COLOR      => 65280,
+      STANDOUT   => 65536, // good
+      UNDERLINE  => 131072, // good
+      REVERSE    => 262144, // good
+      BLINK      => 524288, 
+      DIM        => 1048576,
+      BOLD       => 2097152, // good
+      ALTCHARSET => 4194304,
+      INVIS      => 8388608, // good
+      PROTECT    => 16777216,
+      HORIZONTAL => 33554432,
+      LEFT       => 67108864,
+      LOW        => 134217728,
+      RIGHT      => 268435456,
+      TOP        => 536870912,
+      VERTICAL   => 1073741824,
     };
     //ret ncurses::attrset(val as c_int) as int
-    ret ncurses::attrset(val as c_int) as int
+    return ncurses::attrset(val as c_int) as int
 }
 
 // #[test]
@@ -661,7 +664,7 @@ fn voidsuite() {
 //     //fn extern NCURSES_EXPORT_VAR(n0: c_int) ESCDELAY; 
 //     // fn extern NCURSES_EXPORT_VAR(n0: c_int) LINES; 
 //     //fn extern NCURSES_EXPORT_VAR(n0: c_int) TABSIZE; 
-////     fn has_mouse(v: c_void) -> bool; 
+//     fn has_mouse(v: c_void) -> bool; 
 //     fn has_mouse() -> bool; 
 //     fn getmouse (e: *MEVENT) -> c_int; 
 //     fn ungetmouse (e: *MEVENT) -> c_int; 

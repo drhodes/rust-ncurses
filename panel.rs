@@ -15,7 +15,7 @@ import result::{result, ok, err};
 enum PANEL{}
 enum WINDOW{}
 enum chtype{}
-native mod ncurses {
+extern mod ncurses {
 // -----------------------------------------------------------------------------
 // ./panel.h:56:extern NCURSES_EXPORT(WINDOW*) panel_window (const PANEL *);
     // fn panel_window (p: *PANEL) -> *WINDOW;
