@@ -3,11 +3,8 @@
 // license that can be found in the LICENSE file.
 // 
 
-use std;
-import libc::*;
-import io;
-import str::unsafe;
-import result::{result, ok, err};
+use libc::*;
+use io;
 
 enum NCURSES_ATTR_T {
       NORMAL,
@@ -31,8 +28,8 @@ enum NCURSES_ATTR_T {
       VERTICAL,
 }
 
-enum PANEL{}
-enum WINDOW{}
+pub enum PANEL{}
+pub enum WINDOW{}
 enum SCREEN{}
 //enum chtype{}
 enum _nc_eventlist{}
@@ -119,7 +116,7 @@ extern mod ncurses {
     fn inch () -> chtype; 
     fn inchnstr (ch0: *chtype, n1: c_int) -> c_int; 
     fn inchstr (ch0: *chtype) -> c_int; 
-    fn initscr () ->*WINDOW; 
+    fn initscr () -> *WINDOW; 
 
     fn init_color (s0: c_short, s1: c_short, s2: c_short, s3: c_short) -> c_int; 
     fn init_pair (s0: c_short, s1: c_short, s2: c_short) -> c_int; 
@@ -389,7 +386,9 @@ extern mod ncurses {
 }
 
 fn printw(s: ~str) {
-    str::as_c_str(s, ncurses::printw);
+    unsafe {
+        str::as_c_str(s, ncurses::printw);
+    }
 }
 
 
@@ -415,7 +414,7 @@ const      A_TOP: u32 =        536870912;
 const      A_VERTICAL: u32 =   1073741824;
 
 
-fn attrset(at: NCURSES_ATTR_T) -> int {
+unsafe fn attrset(at: NCURSES_ATTR_T) -> int {
     //let NCURSES_ATTR_SHIFT = 8;
     //#macro[[#Bits[mask, shift], (mask << shift) + NCURSES_ATTR_SHIFT]];  
     //let ct = #Bits[1,0] - 1;
@@ -484,82 +483,82 @@ fn attrset(at: NCURSES_ATTR_T) -> int {
 //     ncurses::endwin();/* End curses mode  */
 // }
 
-
 #[test]
 fn voidsuite() {
-    // ncurses::initscr();
-    // attrset(NORMAL);
-    // printw("voidsuite: ");
-    //ncurses::addch(('H' as u32 | A_BOLD) as chtype ); 
+    unsafe {
+        // ncurses::initscr();
+        // attrset(NORMAL);
+        // printw("voidsuite: ");
+        // ncurses::addch(('H' as u32 | A_BOLD) as chtype ); 
+        // printw(#fmt["ncurses::baudrate(): %?", ncurses::baudrate()]);
+        // #fmt["ncurses::beep : %?", ncurses::beep ()];
+        // #fmt["ncurses::can_change_color: %?", ncurses::can_change_color()];
+        // #fmt["ncurses::cbreak: %?", ncurses::cbreak()];
+        // printw(#fmt["ncurses::clear: %?", ncurses::clear()]);
+        // #fmt["ncurses::clrtobot: %?", ncurses::clrtobot()];
+        // #fmt["ncurses::clrtoeol: %?", ncurses::clrtoeol()];
+        // #fmt["ncurses::def_prog_mode: %?", ncurses::def_prog_mode()];
+        // #fmt["ncurses::def_shell_mode: %?", ncurses::def_shell_mode()];
+        // #fmt["ncurses::delch: %?", ncurses::delch()];
+        // #fmt["ncurses::deleteln: %?", ncurses::deleteln()];
+        // #fmt["ncurses::doupdate: %?", ncurses::doupdate()];
+        // #fmt["ncurses::echo: %?", ncurses::echo()];
+        // #fmt["ncurses::erase: %?", ncurses::erase()];
+        // #fmt["ncurses::endwin: %?", ncurses::endwin()];
+        // #fmt["ncurses::erasechar: %?", ncurses::erasechar()];
+        // #fmt["ncurses::filter: %?", ncurses::filter()];
+        // #fmt["ncurses::flash: %?", ncurses::flash()];
+        // #fmt["ncurses::flushinp: %?", ncurses::flushinp()];
+        // #fmt["ncurses::getch: %?", ncurses::getch()];
+        // #fmt["ncurses::has_colors: %?", ncurses::has_colors()];
+        // #fmt["ncurses::has_ic: %?", ncurses::has_ic()];
+        // #fmt["ncurses::has_il: %?", ncurses::has_il()];
+        // #fmt["ncurses::inch: %?", ncurses::inch()];
+        // #fmt["ncurses::initscr: %?", ncurses::initscr()];
+        // #fmt["ncurses::insertln: %?", ncurses::insertln()];
+        // #fmt["ncurses::isendwin: %?", ncurses::isendwin()];
+        // #fmt["ncurses::killchar: %?", ncurses::killchar()];
+        // #fmt["ncurses::longname: %?", ncurses::longname()];
+        // #fmt["ncurses::nl: %?", ncurses::nl()];
+        // #fmt["ncurses::nocbreak: %?", ncurses::nocbreak()];
+        // #fmt["ncurses::noecho: %?", ncurses::noecho()];
+        // #fmt["ncurses::nonl: %?", ncurses::nonl()];
+        // #fmt["ncurses::noqiflush: %?", ncurses::noqiflush()];
+        // #fmt["ncurses::noraw: %?", ncurses::noraw()];
+        // #fmt["ncurses::qiflush: %?", ncurses::qiflush()];
+        // #fmt["ncurses::raw: %?", ncurses::raw()];
+        // #fmt["ncurses::refresh: %?", ncurses::refresh()];
+        // #fmt["ncurses::resetty: %?", ncurses::resetty()];
+        // #fmt["ncurses::reset_prog_mode: %?", ncurses::reset_prog_mode()];
+        // #fmt["ncurses::reset_shell_mode: %?", ncurses::reset_shell_mode()];
+        // #fmt["ncurses::savetty: %?", ncurses::savetty()];
+        // #fmt["ncurses::slk_attr: %?", ncurses::slk_attr()];
+        // #fmt["ncurses::slk_clear: %?", ncurses::slk_clear()];
+        // #fmt["ncurses::slk_noutrefresh: %?", ncurses::slk_noutrefresh()];
+        // #fmt["ncurses::slk_refresh: %?", ncurses::slk_refresh()];
+        // #fmt["ncurses::slk_restore: %?", ncurses::slk_restore()];
+        // #fmt["ncurses::slk_touch: %?", ncurses::slk_touch()];
+        // #fmt["ncurses::standout: %?", ncurses::standout()];
+        // #fmt["ncurses::standend: %?", ncurses::standend()];
+        // #fmt["ncurses::start_color: %?", ncurses::start_color()];
+        // #fmt["ncurses::termattrs: %?", ncurses::termattrs()];
+        // #fmt["ncurses::termname: %?", ncurses::termname()];
+        // #fmt["ncurses::curses_version: %?", ncurses::curses_version()];
+        // #fmt["ncurses::get_escdelay: %?", ncurses::get_escdelay()];
+        // #fmt["ncurses::use_default_colors: %?", ncurses::use_default_colors()];
 
-    //printw(#fmt["ncurses::baudrate(): %?", ncurses::baudrate()]);
-    // #fmt["ncurses::beep : %?", ncurses::beep ()];
-    //#fmt["ncurses::can_change_color: %?", ncurses::can_change_color()];
-    // #fmt["ncurses::cbreak: %?", ncurses::cbreak()];
-    //printw(#fmt["ncurses::clear: %?", ncurses::clear()]);
-    // #fmt["ncurses::clrtobot: %?", ncurses::clrtobot()];
-    // #fmt["ncurses::clrtoeol: %?", ncurses::clrtoeol()];
-    // #fmt["ncurses::def_prog_mode: %?", ncurses::def_prog_mode()];
-    // #fmt["ncurses::def_shell_mode: %?", ncurses::def_shell_mode()];
-    // #fmt["ncurses::delch: %?", ncurses::delch()];
-    // #fmt["ncurses::deleteln: %?", ncurses::deleteln()];
-    // #fmt["ncurses::doupdate: %?", ncurses::doupdate()];
-    // #fmt["ncurses::echo: %?", ncurses::echo()];
-    // #fmt["ncurses::erase: %?", ncurses::erase()];
-    // #fmt["ncurses::endwin: %?", ncurses::endwin()];
-    // #fmt["ncurses::erasechar: %?", ncurses::erasechar()];
-    // #fmt["ncurses::filter: %?", ncurses::filter()];
-    // #fmt["ncurses::flash: %?", ncurses::flash()];
-    // #fmt["ncurses::flushinp: %?", ncurses::flushinp()];
-    // #fmt["ncurses::getch: %?", ncurses::getch()];
-    // #fmt["ncurses::has_colors: %?", ncurses::has_colors()];
-    // #fmt["ncurses::has_ic: %?", ncurses::has_ic()];
-    // #fmt["ncurses::has_il: %?", ncurses::has_il()];
-    // #fmt["ncurses::inch: %?", ncurses::inch()];
-    // #fmt["ncurses::initscr: %?", ncurses::initscr()];
-    // #fmt["ncurses::insertln: %?", ncurses::insertln()];
-    // #fmt["ncurses::isendwin: %?", ncurses::isendwin()];
-    // #fmt["ncurses::killchar: %?", ncurses::killchar()];
-    // #fmt["ncurses::longname: %?", ncurses::longname()];
-    // #fmt["ncurses::nl: %?", ncurses::nl()];
-    // #fmt["ncurses::nocbreak: %?", ncurses::nocbreak()];
-    // #fmt["ncurses::noecho: %?", ncurses::noecho()];
-    // #fmt["ncurses::nonl: %?", ncurses::nonl()];
-    // #fmt["ncurses::noqiflush: %?", ncurses::noqiflush()];
-    // #fmt["ncurses::noraw: %?", ncurses::noraw()];
-    // #fmt["ncurses::qiflush: %?", ncurses::qiflush()];
-    // #fmt["ncurses::raw: %?", ncurses::raw()];
-    // #fmt["ncurses::refresh: %?", ncurses::refresh()];
-    // #fmt["ncurses::resetty: %?", ncurses::resetty()];
-    // #fmt["ncurses::reset_prog_mode: %?", ncurses::reset_prog_mode()];
-    // #fmt["ncurses::reset_shell_mode: %?", ncurses::reset_shell_mode()];
-    // #fmt["ncurses::savetty: %?", ncurses::savetty()];
-    // #fmt["ncurses::slk_attr: %?", ncurses::slk_attr()];
-    // #fmt["ncurses::slk_clear: %?", ncurses::slk_clear()];
-    // #fmt["ncurses::slk_noutrefresh: %?", ncurses::slk_noutrefresh()];
-    // #fmt["ncurses::slk_refresh: %?", ncurses::slk_refresh()];
-    // #fmt["ncurses::slk_restore: %?", ncurses::slk_restore()];
-    // #fmt["ncurses::slk_touch: %?", ncurses::slk_touch()];
-    // #fmt["ncurses::standout: %?", ncurses::standout()];
-    // #fmt["ncurses::standend: %?", ncurses::standend()];
-    // #fmt["ncurses::start_color: %?", ncurses::start_color()];
-    // #fmt["ncurses::termattrs: %?", ncurses::termattrs()];
-    // #fmt["ncurses::termname: %?", ncurses::termname()];
-    // #fmt["ncurses::curses_version: %?", ncurses::curses_version()];
-    // #fmt["ncurses::get_escdelay: %?", ncurses::get_escdelay()];
-    // #fmt["ncurses::use_default_colors: %?", ncurses::use_default_colors()];
 
+        ncurses::refresh();
+        ncurses::getch();
+        ncurses::endwin();
 
-    ncurses::refresh();
-    ncurses::getch();
-    ncurses::endwin();
+        
 
-    
-
-    //ncurses::nofilte();
-    //ncurses::new_prescr();
-    //ncurses::has_mouse();
-    //ncurses::_nc_tracebits();
+        //ncurses::nofilte();
+        //ncurses::new_prescr();
+        //ncurses::has_mouse();
+        //ncurses::_nc_tracebits();
+    }
 }
 
 

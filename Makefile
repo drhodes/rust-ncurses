@@ -1,9 +1,8 @@
 all:
-	rustc --bin ncurses.rc --test  
+	rustc --lib ncurses.rc
 
 test:
 	rustc --bin ncurses.rc  --test && ./ncurses
-#
-#clean:
-#	rm -rf datetime *.so
-#
+
+clean:
+	rm -f libncurses*so

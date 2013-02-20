@@ -6,4 +6,5 @@
 
 #[crate_type = "lib"];
 
+mod ncurses;
 mod window;
