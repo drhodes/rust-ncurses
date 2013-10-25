@@ -1,62 +1,413 @@
-// documentation strings are derived work licensed under
-// PSF LICENSE AGREEMENT FOR PYTHON 2.7.3, found in python-license.txt
-
 // Copyright 2012 Derek A. Rhodes.  All rights reserved.
-// Use of this source code is governed by a BSD-style
+// Use of this source code is governed by the ncurses
 // license that can be found in the LICENSE file.
-use ncurses::*;
 
-struct Window {
-    // meditate on how to more safely deal with this potential null pointer 
-    win: *WINDOW
+use std::libc::types::os::arch::c95::{ c_char, c_int, c_short, c_long};
+use std::libc::types::common::c95::{ c_void, FILE};
+
+use nc = ncurses;
+use c = ncurses::c;
+use t = types;
+
+pub struct Window {
+    win: *t::WINDOW
 }
 
-fn NewWindow() -> Window {
+/// Drop the window and cleanup the underlying C memory.
+impl Drop for Window {
+    #[fixed_stack_segment]
+    fn drop(&mut self) {
+        unsafe {
+            error!("Deleting window.")
+            c::delwin(self.win);
+        }
+    }
+}
+
+/// initscr() is used to initialize the ncurses data structures and to
+/// read the proper terminfo file. Memory for and will be allocated. If an
+/// error occurs, initscr will return Err, otherwise a pointer to will be
+/// returned. Additionally, the screen will be erased and and will be
+/// initialized.
+#[fixed_stack_segment]
+pub fn initscr() -> Result<Window, ~str> {
     unsafe {
-        Window{win: ncurses::initscr()}
+        match c::initscr() {
+            t::ERR => Err(~"initscr failed to initialize"),
+            p => Ok(Window{win: p as *t::WINDOW}),
+        }
+    }
+}
+
+/// Calling newwin creates and returns a pointer to a new window with the
+/// given number of lines and columns. The upper left-hand corner of the
+/// window is at line begin_y, column begin_x. If either nlines or ncols
+/// is zero, they default to LINES - begin_y and COLS - begin_x. A new
+/// full-screen window is created by calling newwin(0,0,0,0).
+#[fixed_stack_segment]
+pub fn newwin(nlines: int, ncols: int, 
+              begin_y: int, begin_x: int) -> Result<Window, ~str> {
+    unsafe {
+        match c::initscr() {
+            t::ERR => Err(~"initscr failed to initialize"),
+            p => Ok(Window{win: p as *t::WINDOW}),
+        }
     }
 }
 
 impl Window {       
-    // -----------------------------------------------------------------------------
-    // fn addch([y, x], ch[, attr])   
-    /// Paint character ch at (y, x) with attributes attr, overwriting any 
-    /// character previously painter at that location. By default, the 
-    /// character position and attributes are the current settings for the 
-    /// window object
-    fn addch (&self, ch: chtype) -> int {        
+    #[fixed_stack_segment]    
+    pub fn addch(&self, ch: t::chtype) -> int {        
         unsafe {
-            ncurses::addch(ch) as int
+            c::addch(ch) as int
         }
     }
 
-    // -----------------------------------------------------------------------------
-    // window.addstr([y, x], str[, attr])
-    // Paint the string str at (y, x) with attributes attr, overwriting 
-    // anything previously on the display.    
-    fn addstr(&self, y: int, x: int, s: ~str) {       
+    #[fixed_stack_segment] 
+    /// Endwin will clean up all allocated resources from ncurses and restore
+    /// the tty modes to the status they had before calling initscr(). It must
+    /// be called before any other function from the ncurses library and
+    /// endwin() must be called before your program exits. When you want to do
+    /// output to more than one terminal, you can use newterm(...) instead of
+    /// initscr().
+    pub fn endwin(&self) { 
+        unsafe { c::endwin(); }
+    }
+
+    /// Write the characters of the string str on the window starting at
+    /// the current or specified position using the background rendition.
+    #[fixed_stack_segment] 
+    pub fn addstr(&self, y: int, x: int, s: ~str) {       
         unsafe {
             self.mv(y, x);        
-            str::as_c_str(s, {|x| ncurses::addstr(x)});
+            let cs = s.to_c_str().unwrap();
+            c::addstr(cs);
         }
     }
 
-    // -----------------------------------------------------------------------------
-    // window.attroff(attr)
-    // #[doc = "Remove attribute attr from the 'background' set applied to all \
-    //          writes to the current window."]
-
-    // -----------------------------------------------------------------------------
-    // Move cursor to (new_y, new_x).
-    unsafe fn mv (self, y: int, x: int) -> int {
-        ncurses::wmove(self.win, y as c_int, x as c_int) as int
+    /// Move to a point in the window. The coordinate y always refers to
+    /// the row (of the window), and x always refers to the column. The
+    /// upper left-hand corner is always (0,0), not (1,1).
+    #[fixed_stack_segment] 
+    pub fn mv (&self, y: int, x: int) -> int {
+        unsafe {
+            c::wmove(self.win, y as c_int, x as c_int) as int
+        }
     }
 
-    // -----------------------------------------------------------------------------
-    /// Add attribute attr from the 'background' set applied to all writes
-    /// to the current window.
-    // fn attron(self, at: NCURSES_ATTR_T) {
+    #[fixed_stack_segment]
+    pub fn is_nodelay (&self) -> bool {
+        unsafe {
+            c::is_nodelay(self.win)
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn is_notimeout (&self) -> bool {
+        unsafe {
+            c::is_notimeout(self.win)                
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn is_scrollok(&self) -> bool {        
+        unsafe { 
+            c::is_scrollok(self.win) 
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn is_cleared (&self) -> bool { 
+        unsafe {
+            c::is_cleared(self.win)
+        } 
+    }
+
+    #[fixed_stack_segment]
+    pub fn is_idcok (&self) -> bool { 
+        unsafe {
+            c::is_idcok(self.win)
+        } 
+    }
+
+    #[fixed_stack_segment]
+    pub fn is_idlok (&self) -> bool { 
+        unsafe {
+            c::is_idlok(self.win)
+        } 
+    }
+
+    #[fixed_stack_segment]
+    pub fn is_immedok (&self) -> bool { 
+        unsafe {
+            c::is_immedok(self.win)
+        } 
+    }
+
+    #[fixed_stack_segment]
+    pub fn is_keypad (&self) -> bool { 
+        unsafe {
+            c::is_keypad(self.win)
+        } 
+    }
+
+    #[fixed_stack_segment]
+    pub fn is_leaveok (&self) -> bool { 
+        unsafe {
+            c::is_leaveok(self.win)
+        } 
+    }
+
+    #[fixed_stack_segment]
+    pub fn is_syncok (&self) -> bool { 
+        unsafe {
+            c::is_syncok(self.win)
+        } 
+    }
+
+
+    // returns the top and bottom rows for the scrolling margin as set in wsetscrreg.
+    #[fixed_stack_segment]
+    pub fn wgetscrreg (&self) -> (int, int) {
+        unsafe {
+            let mut top: c_int = 0;
+            let mut bottom: c_int = 0;
+            if c::wgetscrreg(self.win, &top, &bottom) != 0 {
+                return (-1, -1); // need to look closer into traditional error handling
+                // with ncurses
+            }
+            
+            return (top as int, bottom as int);
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn box (&self, c1: int, c2: int) -> int {
+        unsafe {
+            let n1 = c1 as t::chtype;
+            let n2 = c2 as t::chtype;
+            return c::box(self.win, n1, n2) as int;
+        }
+    }
+    
+    /// Calling derwin is the same as calling subwin, except that begin_y and
+    /// begin_x are relative to the origin of the window orig rather than the
+    /// screen. There is no difference between the subwindows and the derived
+    /// windows.
+    #[fixed_stack_segment]
+    pub fn derwin(&self, nlines: i32, ncols: i32, 
+                  begin_y: i32, begin_x: i32) -> Window {
+        unsafe {
+            Window{win: c::derwin(self.win, nlines, ncols, begin_y, begin_x)}
+        }  
+    }
+
+    /// Duplicate the window, deep copy.
+    #[fixed_stack_segment]
+    pub fn dupwin (&self) -> Window {
+        unsafe {
+            let w = c::dupwin(self.win);
+            return Window{win: w};            
+        }
+    }
+
+
+    // #[fixed_stack_segment]
+    // pub fn getbkgd (&self, win: *t::WINDOW) -> t::chtype {
     // }
+
+    // #[fixed_stack_segment]
+    // pub fn idcok (&self, win: *t::WINDOW, b1: bool) -> c_void {
+    // }
+
+    // #[fixed_stack_segment]
+    // pub fn idlok (&self, win: *t::WINDOW, b1: bool) -> c_int {
+    // }
+
+    // #[fixed_stack_segment]
+    // pub fn immedok (&self, win: *t::WINDOW, b1: bool) -> c_void {
+    // }
+
+    // #[fixed_stack_segment]
+    // pub fn intrflush (&self, win: *t::WINDOW, b1: bool) -> c_int {
+    // }
+
+    // #[fixed_stack_segment]
+    // pub fn is_linetouched (&self, win: *t::WINDOW, n1: c_int) -> bool {
+    // }
+
+    // #[fixed_stack_segment]
+    // pub fn is_wintouched (&self, win: *t::WINDOW) -> bool {
+    // }
+
+    // #[fixed_stack_segment]
+    // pub fn keypad (&self, win: *t::WINDOW, b1: bool) -> c_int {
+    // }
+
+    // #[fixed_stack_segment]
+    // pub fn leaveok (&self, win: *t::WINDOW, b1: bool) -> c_int {
+    // }
+
+    // #[fixed_stack_segment]
+    // pub fn meta (&self, win: *t::WINDOW, b1: bool) -> c_int {
+    // }
+
+    // #[fixed_stack_segment]
+    // pub fn mvderwin (&self, win: *t::WINDOW, n1: c_int, c2: c_int) -> c_int {
+    //     unsafe {
+    //     }
+    // }
+
+    // #[fixed_stack_segment]
+    // pub fn mvwaddch (&self, win: *t::WINDOW, n1: c_int, c2: c_int, ch3: t::chtype) -> c_int {
+    // }
+
+    // #[fixed_stack_segment]
+    // pub fn mvwaddchnstr (&self, win: *t::WINDOW, n1: c_int, c2: c_int, ch3: *t::chtype, n4: c_int) -> c_int {
+    // }
+
+    // #[fixed_stack_segment]
+    // pub fn mvwaddchstr (&self, win: *t::WINDOW, n1: c_int, c2: c_int, ch3: *t::chtype) -> c_int;    {
+    // }
+
+    // #[fixed_stack_segment]
+    // pub fn mvwaddnstr (&self, win: *t::WINDOW, n1: c_int, c2: c_int, c3: *char, n4: c_int) -> c_int {
+    // }
+
+    // #[fixed_stack_segment]
+    // pub fn mvwaddstr (&self, win: *t::WINDOW, n1: c_int, c2: c_int, c3: *char) -> c_int {
+    // }
+
+    // //#[fixed_stack_segment]
+    // // args clipped pub fn mvwchgat (&self, win: *t::WINDOW, n1: c_int, c2: c_int, c3: c_int, at4: t::attr_t, s: c_short, v {
+    // //}
+
+    // #[fixed_stack_segment]
+    // pub fn mvwdelch (&self, win: *t::WINDOW, n1: c_int, c2: c_int) -> c_int {
+    // }
+    // #[fixed_stack_segment]
+    // pub fn mvwgetch (&self, win: *t::WINDOW, n1: c_int, c2: c_int) -> c_int {
+    // }
+    // #[fixed_stack_segment]
+    // pub fn mvwgetnstr (&self, win: *t::WINDOW, n1: c_int, c2: c_int, c3: *char, n4: c_int) -> c_int {
+    // }
+}
+
+
+
+/*
+    pub fn mvwgetstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *char) -> c_int; 
+    pub fn mvwhline (win: *t::WINDOW, n1: c_int, c2: c_int, ch3: t::chtype, n4: c_int) -> c_int; 
+    pub fn mvwin (win: *t::WINDOW, n1: c_int, c2: c_int) -> c_int; 
+    pub fn mvwinch (win: *t::WINDOW, n1: c_int, c2: c_int) -> t::chtype; 
+    pub fn mvwinchnstr (win: *t::WINDOW, n1: c_int, c2: c_int, ch3: *t::chtype, n4: c_int) -> c_int; 
+    pub fn mvwinchstr (win: *t::WINDOW, n1: c_int, c2: c_int, ch3: *t::chtype) -> c_int; 
+    pub fn mvwinnstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *char, n4: c_int) -> c_int; 
+    pub fn mvwinsch (win: *t::WINDOW, n1: c_int, c2: c_int, ch3: t::chtype) -> c_int; 
+    pub fn mvwinsnstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *char, n4: c_int) -> c_int; 
+    pub fn mvwinsstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *char) -> c_int; 
+    pub fn mvwinstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *char) -> c_int; 
+        //pub fn mvwprc_intw (win0: *t::WINDOW, n1: c_int, c2: c_int, c3: *char四...); 
+        pub fn notimeout (win: *t::WINDOW, b1: bool) -> c_int; 
+        pub fn overlay (win0: *t::WINDOW, win: *t::WINDOW) -> c_int; 
+        pub fn overwrite (win0: *t::WINDOW, win: *t::WINDOW) -> c_int; 
+        pub fn pechochar (win: *t::WINDOW, c1: t::chtype) -> c_int; 
+        pub fn pnoutrefresh (win0: *t::WINDOW, n1: c_int, c2: c_int, c3: c_int, 
+        pub fn prefresh (win: *t::WINDOW, n1: c_int, c2: c_int, c3: c_int, 
+        // pub fn extern NCURSES_EXPORT(n0: c_int) putwin (win: *t::WINDOW一*FILE) -> c_int; 
+        pub fn redrawwin (win: *t::WINDOW) -> c_int; 
+        //pub fn ripoffline (n0: c_int, n1: c_int (*)(win: *t::WINDOW, c2: c_int)) -> c_int;  todo functio        pub fn scroll (win: *t::WINDOW) -> c_int; 
+        pub fn scrollok (win: *t::WINDOW, b1: bool) -> c_int; 
+        pub fn subpad (win: *t::WINDOW, n1: c_int, c2: c_int, c3: c_int, n4: c_int) -> *t::WINDOW; 
+        pub fn subwin (win: *t::WINDOW, n1: c_int, c2: c_int, c3: c_int, n4: c_int) -> *t::WINDOW; 
+        pub fn syncok (win: *t::WINDOW, b1: bool) -> c_int; 
+        pub fn touchline (win: *t::WINDOW, n1: c_int, c2: c_int) -> c_int; 
+        pub fn touchwin (win: *t::WINDOW) -> c_int; 
+        pub fn untouchwin (win: *t::WINDOW) -> c_int; 
+        pub fn vwprintw (win: *t::WINDOW, c1: *char, va2: t::va_list) -> c_int; 
+        pub fn vw_printw (win: *t::WINDOW, c1: *char, va2: t::va_list) -> c_int; 
+        pub fn vwscanw (win: *t::WINDOW, c1: *char, va2: t::va_list) -> c_int; 
+        pub fn vw_scanw (win: *t::WINDOW, c1: *char, va2: t::va_list) -> c_int; 
+        pub fn waddch (win: *t::WINDOW, c1: t::chtype) -> c_int; 
+        pub fn waddchnstr (win: *t::WINDOW, ch1: *t::chtype, c2: c_int) -> c_int; 
+        pub fn waddchstr (win: *t::WINDOW, ch1: *t::chtype) -> c_int; 
+        pub fn waddnstr (win: *t::WINDOW, c1: *char, c2: c_int) -> c_int; 
+        pub fn waddstr (win: *t::WINDOW, c1: *char) -> c_int; 
+        pub fn wattron (win: *t::WINDOW, n1: c_int) -> c_int; 
+        pub fn wattroff (win: *t::WINDOW, n1: c_int) -> c_int; 
+        pub fn wattrset (win: *t::WINDOW, n1: c_int) -> c_int; 
+        pub fn wattr_get (win: *t::WINDOW, at1: *t::attr_t, s2: *c_short, v3: *c_void) -> c_int; 
+        pub fn wattr_on (win: *t::WINDOW, at2: t::attr_t, v2: *c_void) -> c_int; 
+        pub fn wattr_off (win: *t::WINDOW, at2: t::attr_t, v2: *c_void) -> c_int; 
+        pub fn wattr_set (win: *t::WINDOW, at2: t::attr_t, s2: c_short, v3: *c_void) -> c_int; 
+        pub fn wbkgd (win: *t::WINDOW, c1: t::chtype) -> c_int; 
+        pub fn wbkgdset (win: *t::WINDOW, c1: t::chtype) -> c_void; 
+        pub fn wborder (win: *t::WINDOW, c1: t::chtype, c2: t::chtype, ch3: t::chtype, ch4: t::chtype,
+        pub fn wchgat (win: *t::WINDOW, n1: c_int, at: t::attr_t, s3: c_short, v: *c_void) -> c_int; 
+        pub fn wclear (win: *t::WINDOW) -> c_int; 
+        pub fn wclrtobot (win: *t::WINDOW) -> c_int; 
+        pub fn wclrtoeol (win: *t::WINDOW) -> c_int; 
+        pub fn wcolor_set (win0: *t::WINDOW, s1: c_short, v2: *c_void) -> c_int; 
+        pub fn wcursyncup (win: *t::WINDOW) -> c_void; 
+        pub fn wdelch (win: *t::WINDOW) -> c_int; 
+        pub fn wdeleteln (win: *t::WINDOW) -> c_int; 
+        pub fn wechochar (win: *t::WINDOW, c1: t::chtype) -> c_int; 
+        pub fn werase (win: *t::WINDOW) -> c_int; 
+        pub fn wgetch (win: *t::WINDOW) -> c_int; 
+        pub fn wgetnstr (win: *t::WINDOW, c1: *char, c2: c_int) -> c_int; 
+        pub fn wgetstr (win: *t::WINDOW, c1: *char) -> c_int; 
+        pub fn whline (win: *t::WINDOW, c1: t::chtype, c2: c_int) -> c_int; 
+        pub fn winch (win: *t::WINDOW) -> t::chtype; 
+        pub fn winchnstr (win: *t::WINDOW, ch1: *t::chtype, c2: c_int) -> c_int; 
+        pub fn winchstr (win: *t::WINDOW, ch1: *t::chtype) -> c_int; 
+        pub fn winnstr (win: *t::WINDOW, c1: *char, c2: c_int) -> c_int; 
+        pub fn winsch (win: *t::WINDOW, c1: t::chtype) -> c_int; 
+        pub fn winsdelln (win: *t::WINDOW, n1: c_int) -> c_int; 
+        pub fn winsertln (win: *t::WINDOW) -> c_int; 
+        pub fn winsnstr (win: *t::WINDOW, c1: *char, c2: c_int) -> c_int; 
+        pub fn winsstr (win: *t::WINDOW, c1: *char) -> c_int; 
+        pub fn winstr (win: *t::WINDOW, c1: *char) -> c_int; 
+        pub fn wmove (win: *t::WINDOW, n1: c_int, c2: c_int) -> c_int; 
+        pub fn wnoutrefresh (win: *t::WINDOW) -> c_int; 
+        //pub fn wprc_intw (win: *t::WINDOW, c1: *char二...); 
+        pub fn wredrawln (win: *t::WINDOW, n1: c_int, c2: c_int) -> c_int; 
+        pub fn wrefresh (win: *t::WINDOW) -> c_int; 
+        //pub fn wscanw (win: *t::WINDOW, c1: *char二...); 
+        pub fn wscrl (win: *t::WINDOW, n1: c_int) -> c_int; 
+        pub fn wsetscrreg (win: *t::WINDOW, n1: c_int, c2: c_int) -> c_int; 
+        pub fn wstandout (win: *t::WINDOW) -> c_int; 
+        pub fn wstandend (win: *t::WINDOW) -> c_int; 
+        pub fn wsyncdown (win: *t::WINDOW) -> c_void; 
+        pub fn wsyncup (win: *t::WINDOW) -> c_void; 
+        pub fn wtimeout (win: *t::WINDOW, n1: c_int) -> c_void; 
+        pub fn wtouchln (win: *t::WINDOW, n1: c_int, c2: c_int, c3: c_int) -> c_int; 
+        pub fn wvline (win: *t::WINDOW, c1: t::chtype, c2: c_int) -> c_int; 
+        pub fn getattrs (win: *t::WINDOW) -> c_int; 
+        pub fn getcurx (win: *t::WINDOW) -> c_int; 
+        pub fn getcury (win: *t::WINDOW) -> c_int; 
+        pub fn getbegx (win: *t::WINDOW) -> c_int; 
+        pub fn getbegy (win: *t::WINDOW) -> c_int; 
+        pub fn getmaxx (win: *t::WINDOW) -> c_int; 
+        pub fn getmaxy (win: *t::WINDOW) -> c_int; 
+        pub fn getparx (win: *t::WINDOW) -> c_int; 
+        pub fn getpary (win: *t::WINDOW) -> c_int; 
+        pub fn use_window (win: *t::WINDOW, c1: t::WINDOW_CB, v2: *c_void) -> c_int; 
+        pub fn wresize (win: *t::WINDOW, n1: c_int, c2: c_int) -> c_int; 
+        pub fn wgetparent (win: *t::WINDOW) -> *t::WINDOW; 
+        pub fn is_cleared (win: *t::WINDOW) -> bool; 
+        pub fn is_idcok (win: *t::WINDOW) -> bool; 
+        pub fn is_idlok (win: *t::WINDOW) -> bool; 
+        pub fn is_immedok (win: *t::WINDOW) -> bool; 
+        pub fn is_keypad (win: *t::WINDOW) -> bool; 
+        pub fn is_leaveok (win: *t::WINDOW) -> bool; 
+*/
+
+
+
+
+
+
+/*
 
 
     /// "Set the 'background' set of attributes to attr. This set is
@@ -67,28 +418,29 @@ impl Window {
         }
     }
 }
+*/
 
-#[test]
-fn hello2() {
-    let win = NewWindow();
-    unsafe {
-        win.attrset(A_BOLD);
-        win.addstr(1, 1, ~"你好 Hello");
+// #[test]
+// fn hello2() {
+//     let win = NewWindow();
+//     unsafe {
+//         win.attrset(A_BOLD);
+//         win.addstr(1, 1, ~"你好 Hello");
         
-        for int::range(2i, 9i) |n|{
-            attrset(REVERSE);
-            win.addstr(n as int, (n as int)*2, ~" World !!!");
-            ncurses::refresh();/* Print it on to the real screen */
-        }
-        ncurses::getch();/* Wait for user input */
-        ncurses::endwin();/* End curses mode  */
-    }
-}
+//         for n in range(2, 9) {
+//             attrset(REVERSE);
+//             win.addstr(n as int, (n as int)*2, ~" World !!!");
+//             ncurses::refresh();/* Print it on to the real screen */
+//         }
+//         ncurses::getch();/* Wait for user input */
+//         ncurses::endwin();/* End curses mode  */
+//     }
+// }
 
 
 
     // -----------------------------------------------------------------------------
-    //         Note
+    //         note
     //         A character means a C character (an ASCII code), rather than a
     //         Python character (a string of length 1). (This note is true
     //         whenever the documentation mentions a character.) The built-in
@@ -106,9 +458,6 @@ fn hello2() {
     //     }
     //     str::as_c_str(s, {|x| ncurses::addnstr(c: *char, n1: c_int)})
     // }
-
-
-
 
 
     // -----------------------------------------------------------------------------
@@ -162,6 +511,9 @@ fn hello2() {
     //         |-------------+-------------------------+------------------------|
     //         | br          | Bottom-right corner     | ACS_LRCORNER           |
     //         +----------------------------------------------------------------+
+
+
+
 
     // -----------------------------------------------------------------------------
     // window.box([vertch, horch])
@@ -563,3 +915,4 @@ fn hello2() {
     // window.vline([y, x], ch, n)
     // Display a vertical line starting at (y, x) with length n
     // consisting of the character ch.
+
