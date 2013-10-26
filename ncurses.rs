@@ -90,7 +90,7 @@ pub mod c {
         pub fn inch () -> t::chtype; 
         pub fn inchnstr (ch0: *t::chtype, n1: c_int) -> c_int; 
         pub fn inchstr (ch0: *t::chtype) -> c_int; 
-        pub fn initscr () -> c_int; //*t::WINDOW; 
+        pub fn initscr () -> *t::WINDOW; 
         pub fn init_color (s0: c_short, s1: c_short, s2: c_short, s3: c_short) -> c_int; 
         pub fn init_pair (s0: c_short, s1: c_short, s2: c_short) -> c_int; 
         pub fn innstr (c: *char, n1: c_int) -> c_int; 

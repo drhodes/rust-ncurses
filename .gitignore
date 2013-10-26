@@ -86,3 +86,4 @@ doc/core/
 tmp.*.rs
 config.stamp
 .DS_Store
+deploy-docs.sh

@@ -13,7 +13,10 @@ lib:
 	rustc ${SAFETY} --lib crate.rs -A unused_imports
 
 clean:
-	rm -f libncurses*so *~ testbin
+	rm -f libncurses*so *~ testbin packed-docs.zip
+	cd examples/helloworld && make clean
+	cd doc && make clean
 
 docs:
 	rustdoc crate.rs -o ./doc --output-format html
+
