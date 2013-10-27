@@ -9,13 +9,14 @@
 
 use std::libc::types::os::arch::c95::{ c_char, c_int, c_short, c_long};
 use std::libc::types::common::c95::{ c_void, FILE};
+use std::rt::io::Writer;
 
 use nc = ncurses;
 use c = ncurses::c;
 use t = types;
 use types::{TRUE, FALSE, OK, ERR};
-
-
+use std::char::from_u32;
+use std::rt::io;
 
 pub struct Window {
     win: *t::WINDOW
@@ -58,6 +59,32 @@ pub fn newwin(nlines: i32, ncols: i32,
 }
 
 impl Window {       
+    //
+    pub fn screenShot(&self, filename: ~str) {
+        let bottom = self.getmaxy();        
+        let right = self.getmaxx();
+        
+        let p = &Path::new(filename);
+        let mut of = io::file::open(p, io::Create, io::Write).unwrap();
+
+        error!("{}, {}", bottom, right);
+        
+        for row in range(0, bottom) {
+            for col in range(0, right) {
+                let mut bs: ~[u8] = ~[];
+                match self.mvwinch(row, col) {
+                    Some(c) => {
+                        bs.push(c as u8);
+                    }                    
+                    None => {
+                        bs.push('?' as u8);
+                        }
+                }
+                of.write(bs);
+            }
+        }
+    }   
+    
     #[fixed_stack_segment]    
     pub fn addch(&self, ch: t::chtype) -> int {        
         unsafe {
@@ -351,22 +378,31 @@ impl Window {
         }
     }
 
-    /// move window add ch m str.
-    #[fixed_stack_segment]
-    pub fn mvwaddchnstr (&self, y: i32, x: i32, s: ~str, cutoff: i32) -> i32 {
-        unsafe {            
-            // mvwaddchnstr (win: *t::WINDOW, n1: c_int, c2: c_int, ch3: *t::chtype, n4: c_int) -> c_int; 
-            c::mvwaddchnstr(self.win, y, x, s.to_c_str().unwrap() as *u32, cutoff)
-        }
-    }
+    // /// move to (y, x) and add up to n chars from the string `s`
+    // #[fixed_stack_segment]
+    // pub fn mvwaddchnstr (&self, y: i32, x: i32, s: ~str, n: i32) -> i32 {
+    //     unsafe {            
+    //         // mvwaddchnstr (win: *t::WINDOW, n1: c_int, c2: c_int, ch3: *t::chtype, n4: c_int) -> c_int; 
+    //         //c::mvwaddchnstr(self.win, y, x, s.to_c_str().unwrap() as *u32, n)
+    //         let cstr = s.to_c_str().unwrap();
+    //         error!("%S", cstr);
+    //         return c::mvwaddchnstr(self.win, y, x, cstr, n);            
 
+    //         // fn with_ref<T>(&self, f: &fn(*c_char) -> T) -> T
+    //         s.slice(0, n)
+    //     }
+    // }
+
+
+    // Not working correctly, only shows the first couple characters,
+    // then garbage.
     #[fixed_stack_segment]
-    pub fn mvwaddchstr (&self,  n1: i32, c2: i32, ch3: *t::chtype) -> i32 {
+    pub fn mvwaddchstr (&self,  y: i32, x: i32, s: ~str) -> i32 {
         unsafe{
-            c::mvwaddchstr(self.win, n1, c2, ch3)
+            let cs = s.to_c_str().unwrap();
+            c::mvwaddchstr(self.win, y, x, cs)
         }
     }
-
     #[fixed_stack_segment]
     pub fn mvwaddnstr (&self,  n1: i32, c2: i32, c3: *char, n4: i32) -> i32 {
         unsafe{
@@ -403,30 +439,135 @@ impl Window {
         }
     }
 
+    /// mvwgetnstr, moves to y, x and reads at most n characters, thus
+    /// preventing a possible over flow of the input buffer. Any attempt to
+    /// enter more characters (other than the terminating newline or carriage
+    /// return) causes a beep. Function keys also cause a beep and are
+    /// ignored.
     #[fixed_stack_segment]
     pub fn mvwgetnstr (&self,  n1: i32, c2: i32, c3: *char, n4: i32) -> i32 {
         unsafe{
             c::mvwgetnstr(self.win, n1, c2, c3, n4)
         }
     }
+
+    /// input a single-byte character and rendition from a window 
+    #[fixed_stack_segment]
+    pub fn mvwinch (&self, y: i32, x: i32) -> Option<char> {
+        unsafe {
+            let ch = c::mvwinch(self.win, y, x);
+            from_u32(ch)
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn getmaxx (&self) -> i32 {
+        unsafe {
+            c::getmaxx(self.win) as i32
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn getmaxy (&self) -> i32 {
+        unsafe {
+            c::getmaxy(self.win) as i32
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn mvwgetstr (&self, n1: i32, c2: i32, c3: *char) -> i32 {
+        unsafe {
+            c::mvwgetstr(self.win, n1, c2, c3)
+        }
+    }
+    
+
+    // Same as whline except that wmove() is called to move the cursor
+    // to the position specified by y, x before the line is drawn on the
+    // window.
+    #[fixed_stack_segment]
+    pub fn mvwhline (&self, n1: i32, c2: i32, ch3: t::chtype, n4: i32) -> i32 {
+        unsafe {
+            c::mvwhline(self.win, n1, c2, ch3, n4)
+        }
+    }
+
+    /// Calling mvwin moves the window so that the upper left-hand corner is
+    /// at position (x, y). If the move would cause the window to be off the
+    /// screen, it is an error and the window is not moved. Moving subwindows
+    /// is allowed, but should be avoided.
+    #[fixed_stack_segment]
+    pub fn mvwin (&self, y: i32, x: i32) -> i32 {
+        unsafe {
+            c::mvwin(self.win, y, x)
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn mvwinsch (&self, n1: i32, c2: i32, ch3: t::chtype) -> i32 {
+        unsafe {
+            c::mvwinsch(self.win, n1, c2, ch3)
+        }
+    }
+
+    /// These routines insert a character string, as many characters as
+    /// will fit on the line, before the character under the cursor.All
+    /// characters to the right of the cursor are shifted right with the
+    /// possibility of the rightmost characters on the line being lost.
+    /// The cursor position does not change (after moving to y, x, if
+    /// specified).The functions with nas the last argument insert a
+    /// leading substring of at most n characters.  If n<=0, then the
+    /// entire string is inserted.
+
+    #[fixed_stack_segment]
+    pub fn mvwinchstr (&self, n1: i32, c2: i32, ch3: *t::chtype) -> i32 {
+        unsafe {
+            c::mvwinchstr(self.win, n1, c2, ch3)
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn mvwinnstr (&self, n1: i32, c2: i32, c3: *char, n4: i32) -> i32 {
+        unsafe {
+            c::mvwinnstr(self.win, n1, c2, c3, n4)
+        }
+    }
+    
+    #[fixed_stack_segment]
+    pub fn mvwinchnstr (&self, c1: i32, c2: i32,  ch3: *t::chtype, n4: i32) -> i32 {
+        unsafe {
+            c::mvwinchnstr(self.win, c1, c2, ch3, n4)
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn mvwinsnstr (&self, n1: i32, c2: i32, c3: *char, n4: i32) -> i32 {
+        unsafe {
+            c::mvwinsnstr(self.win, n1, c2, c3, n4)
+        }
+    }
+
+
+    #[fixed_stack_segment]
+    pub fn mvwinsstr (&self, n1: i32, c2: i32, c3: *char) -> i32 {
+        unsafe {
+            c::mvwinsstr(self.win, n1, c2, c3)
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn mvwinstr (&self, n1: i32, c2: i32, c3: *char) -> i32 {
+        unsafe {
+            c::mvwinstr(self.win, n1, c2, c3)
+        }
+    }
+
 }
 
 
 
 /*
-    pub fn mvwgetstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *char) -> c_int; 
-    pub fn mvwhline (win: *t::WINDOW, n1: c_int, c2: c_int, ch3: t::chtype, n4: c_int) -> c_int; 
-    pub fn mvwin (win: *t::WINDOW, n1: c_int, c2: c_int) -> c_int; 
-    pub fn mvwinch (win: *t::WINDOW, n1: c_int, c2: c_int) -> t::chtype; 
-    pub fn mvwinchnstr (win: *t::WINDOW, n1: c_int, c2: c_int, ch3: *t::chtype, n4: c_int) -> c_int; 
-    pub fn mvwinchstr (win: *t::WINDOW, n1: c_int, c2: c_int, ch3: *t::chtype) -> c_int; 
-    pub fn mvwinnstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *char, n4: c_int) -> c_int; 
-    pub fn mvwinsch (win: *t::WINDOW, n1: c_int, c2: c_int, ch3: t::chtype) -> c_int; 
-    pub fn mvwinsnstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *char, n4: c_int) -> c_int; 
-    pub fn mvwinsstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *char) -> c_int; 
-    pub fn mvwinstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *char) -> c_int; 
         //pub fn mvwprc_intw (win0: *t::WINDOW, n1: c_int, c2: c_int, c3: *char四...); 
-        pub fn notimeout (win: *t::WINDOW, b1: bool) -> c_int; 
         pub fn overlay (win0: *t::WINDOW, win: *t::WINDOW) -> c_int; 
         pub fn overwrite (win0: *t::WINDOW, win: *t::WINDOW) -> c_int; 
         pub fn pechochar (win: *t::WINDOW, c1: t::chtype) -> c_int; 
@@ -505,8 +646,6 @@ impl Window {
         pub fn getcury (win: *t::WINDOW) -> c_int; 
         pub fn getbegx (win: *t::WINDOW) -> c_int; 
         pub fn getbegy (win: *t::WINDOW) -> c_int; 
-        pub fn getmaxx (win: *t::WINDOW) -> c_int; 
-        pub fn getmaxy (win: *t::WINDOW) -> c_int; 
         pub fn getparx (win: *t::WINDOW) -> c_int; 
         pub fn getpary (win: *t::WINDOW) -> c_int; 
         pub fn use_window (win: *t::WINDOW, c1: t::WINDOW_CB, v2: *c_void) -> c_int; 

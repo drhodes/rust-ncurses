@@ -17,7 +17,7 @@ pub mod c {
     use std::libc::types::common::c95::{ c_void, FILE};
     use t = types;
 
-    #[link_args = "-lncurses"]
+    #[link_args = "-lncursesw"]
     extern {
         //extern NCURSES_EXPORT_VAR(t::chtype) acs_map[];  
         //fn wgetch_events (win: *t::WINDOW, nc: *_nc_eventlist) -> c_int; 
@@ -140,11 +140,18 @@ pub mod c {
         // extern NCURSES_EXPORT(n0: c_int) mvvline (n0: c_int, n1: c_int, c2: t::chtype, c3: c_int) -> c_int; 
         pub fn mvvline (n0: c_int, n1: c_int, c2: t::chtype, c3: c_int) -> c_int; 
         pub fn mvwaddch (win: *t::WINDOW, n1: c_int, c2: c_int, ch3: t::chtype) -> c_int; 
-        pub fn mvwaddchnstr (win: *t::WINDOW, n1: c_int, c2: c_int, ch3: *t::chtype, n4: c_int) -> c_int; 
-        pub fn mvwaddchstr (win: *t::WINDOW, n1: c_int, c2: c_int, ch3: *t::chtype) -> c_int;     
+        //pub fn mvwaddchnstr (win: *t::WINDOW, n1: c_int, c2: c_int, 
+        //                     ch3: *t::chtype, n4: c_int) -> c_int; 
+
+        pub fn mvwaddchnstr (win: *t::WINDOW, n1: c_int, c2: c_int, ch3: *c_char, n4: c_int) -> c_int; 
+
+        //pub fn mvwaddchstr (win: *t::WINDOW, n1: c_int, c2: c_int, ch3: *t::chtype) -> c_int;     
+        pub fn mvwaddchstr (win: *t::WINDOW, n1: c_int, c2: c_int, ch3: *c_char) -> c_int;     
+
         pub fn mvwaddnstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *char, n4: c_int) -> c_int; 
         pub fn mvwaddstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *char) -> c_int; 
-        pub fn mvwchgat (win: *t::WINDOW, n1: c_int, c2: c_int, c3: c_int, at4: t::attr_t, s: c_short, v: *c_void) -> c_int; 
+        pub fn mvwchgat (win: *t::WINDOW, n1: c_int, c2: c_int, c3: c_int, 
+                         at4: t::attr_t, s: c_short, v: *c_void) -> c_int; 
         pub fn mvwdelch (win: *t::WINDOW, n1: c_int, c2: c_int) -> c_int; 
         pub fn mvwgetch (win: *t::WINDOW, n1: c_int, c2: c_int) -> c_int; 
         pub fn mvwgetnstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *char, n4: c_int) -> c_int; 
@@ -197,6 +204,7 @@ pub mod c {
         pub fn savetty () -> c_int; 
         //pub fn scanw (NCURSES_*char一...) 
         // pub fn extern NCURSES_EXPORT(n0: c_int) scr_dump (c: *char) -> c_int; 
+        pub fn scr_dump (c: *i8) -> c_int; 
         pub fn scr_init (c: *char) -> c_int; 
         pub fn scrl (n0: c_int) -> c_int; 
         pub fn scroll (win: *t::WINDOW) -> c_int; 
@@ -372,6 +380,15 @@ pub fn printw(s: ~str) {
 pub fn getch() -> int {
     unsafe {
         return c::getch() as int
+    }
+}
+
+#[fixed_stack_segment]
+pub fn scr_dump (filename: ~str) -> i32 {
+    unsafe {        
+        //pub fn scr_dump (c: *char) -> c_int; 
+        let bs = filename.to_c_str().unwrap();
+        c::scr_dump(bs)
     }
 }
 

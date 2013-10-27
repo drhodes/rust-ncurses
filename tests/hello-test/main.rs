@@ -32,11 +32,8 @@ fn main() {
     status(12, &win, win.is_nodelay(), ~"is_nodelay");
     status(13, &win, win.is_syncok(), ~"is_syncok");
 
-    let (top, bot) = win.wgetscrreg();       
-    let msg = format!("Margin: top: {}, bottom: {}", top, bot);
-
+    win.screenShot(~"hello-test.output");
     nc::refresh();       // Print it on to the real screen 
-    nc::getch();         // Wait for user input 
     win.endwin();        // End curses mode  
 }
 

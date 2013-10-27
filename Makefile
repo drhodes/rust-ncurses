@@ -15,7 +15,7 @@ lib:
 clean:
 	rm -f libncurses*so *~ testbin packed-docs.zip
 	cd examples/helloworld && make clean
-	cd doc && make clean
+	cd tests/hello-test && make clean
 
 docs:
 	rustdoc crate.rs -o ./doc --output-format html
