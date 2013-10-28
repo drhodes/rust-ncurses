@@ -148,30 +148,30 @@ pub mod c {
         //pub fn mvwaddchstr (win: *t::WINDOW, n1: c_int, c2: c_int, ch3: *t::chtype) -> c_int;     
         pub fn mvwaddchstr (win: *t::WINDOW, n1: c_int, c2: c_int, ch3: *c_char) -> c_int;     
 
-        pub fn mvwaddnstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *char, n4: c_int) -> c_int; 
-        pub fn mvwaddstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *char) -> c_int; 
+        pub fn mvwaddnstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *c_char, n4: c_int) -> c_int; 
+        pub fn mvwaddstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *c_char) -> c_int; 
         pub fn mvwchgat (win: *t::WINDOW, n1: c_int, c2: c_int, c3: c_int, 
                          at4: t::attr_t, s: c_short, v: *c_void) -> c_int; 
         pub fn mvwdelch (win: *t::WINDOW, n1: c_int, c2: c_int) -> c_int; 
         pub fn mvwgetch (win: *t::WINDOW, n1: c_int, c2: c_int) -> c_int; 
-        pub fn mvwgetnstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *char, n4: c_int) -> c_int; 
-        pub fn mvwgetstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *char) -> c_int; 
+        pub fn mvwgetnstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *c_char, n4: c_int) -> c_int; 
+        pub fn mvwgetstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *c_char) -> c_int; 
         pub fn mvwhline (win: *t::WINDOW, n1: c_int, c2: c_int, ch3: t::chtype, n4: c_int) -> c_int; 
         pub fn mvwin (win: *t::WINDOW, n1: c_int, c2: c_int) -> c_int; 
         pub fn mvwinch (win: *t::WINDOW, n1: c_int, c2: c_int) -> t::chtype; 
         pub fn mvwinchnstr (win: *t::WINDOW, n1: c_int, c2: c_int, ch3: *t::chtype, n4: c_int) -> c_int; 
         pub fn mvwinchstr (win: *t::WINDOW, n1: c_int, c2: c_int, ch3: *t::chtype) -> c_int; 
-        pub fn mvwinnstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *char, n4: c_int) -> c_int; 
+        pub fn mvwinnstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *c_char, n4: c_int) -> c_int; 
         pub fn mvwinsch (win: *t::WINDOW, n1: c_int, c2: c_int, ch3: t::chtype) -> c_int; 
-        pub fn mvwinsnstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *char, n4: c_int) -> c_int; 
-        pub fn mvwinsstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *char) -> c_int; 
-        pub fn mvwinstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *char) -> c_int; 
-        //pub fn mvwprc_intw (win0: *t::WINDOW, n1: c_int, c2: c_int, c3: *char四...); 
-        //// extern NCURSES_EXPORT(n0: c_int) mvwscanw (win: *t::WINDOW, n1: c_int, c2: c_int三NCURSES_*char四...) 
+        pub fn mvwinsnstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *c_char, n4: c_int) -> c_int; 
+        pub fn mvwinsstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *c_char) -> c_int; 
+        pub fn mvwinstr (win: *t::WINDOW, n1: c_int, c2: c_int, c3: *c_char) -> c_int; 
+        //pub fn mvwprc_intw (win0: *t::WINDOW, n1: c_int, c2: c_int, c3: *c_char四...); 
+        //// extern NCURSES_EXPORT(n0: c_int) mvwscanw (win: *t::WINDOW, n1: c_int, c2: c_int三NCURSES_*c_char四...) 
         // // pub fn extern NCURSES_EXPORT(n0: c_int) mvwvline (win: *t::WINDOW, n1: c_int, c2: c_int, ch3: t::chtype, n4: c_int) -> c_int; 
         pub fn napms (n0: c_int) -> c_int; 
         pub fn newpad (n0: c_int, n1: c_int) -> *t::WINDOW; 
-        pub fn newterm (c: *char, f1: *FILE, f2: *FILE) -> *t::SCREEN; 
+        pub fn newterm (c: *c_char, f1: *FILE, f2: *FILE) -> *t::SCREEN; 
         pub fn newwin (n0: c_int, n1: c_int, c2: c_int, c3: c_int) -> *t::WINDOW; 
         pub fn nl () -> c_int; 
         pub fn nocbreak () -> c_int; 
@@ -191,7 +191,7 @@ pub mod c {
         pub fn prefresh (win: *t::WINDOW, n1: c_int, c2: c_int, c3: c_int, 
                          c4: c_int, c5: c_int, c6: c_int) -> c_int; 
         pub fn printw (c: *c_char) -> c_int;
-        //pub fn prc_intw (c: *char一...) 
+        //pub fn prc_intw (c: *c_char一...) 
         // pub fn extern NCURSES_EXPORT(n0: c_int) putwin (win: *t::WINDOW一*FILE) -> c_int; 
         pub fn qiflush () -> c_void; 
         pub fn raw () -> c_int; 
@@ -202,15 +202,15 @@ pub mod c {
         pub fn reset_shell_mode () -> c_int; 
         //pub fn ripoffline (n0: c_int, n1: c_int (*)(win: *t::WINDOW, c2: c_int)) -> c_int;  todo function ptr fun fun fun
         pub fn savetty () -> c_int; 
-        //pub fn scanw (NCURSES_*char一...) 
-        // pub fn extern NCURSES_EXPORT(n0: c_int) scr_dump (c: *char) -> c_int; 
+        //pub fn scanw (NCURSES_*c_char一...) 
+        // pub fn extern NCURSES_EXPORT(n0: c_int) scr_dump (c: *c_char) -> c_int; 
         pub fn scr_dump (c: *i8) -> c_int; 
-        pub fn scr_init (c: *char) -> c_int; 
+        pub fn scr_init (c: *c_char) -> c_int; 
         pub fn scrl (n0: c_int) -> c_int; 
         pub fn scroll (win: *t::WINDOW) -> c_int; 
         pub fn scrollok (win: *t::WINDOW, b1: bool) -> c_int; 
-        pub fn scr_restore (c: *char) -> c_int; 
-        pub fn scr_set (c: *char) -> c_int; 
+        pub fn scr_restore (c: *c_char) -> c_int; 
+        pub fn scr_set (c: *c_char) -> c_int; 
         pub fn setscrreg (n0: c_int, n1: c_int) -> c_int; 
         pub fn set_term (scr0: *t::SCREEN) -> *t::SCREEN; 
         pub fn slk_attroff (ch0: t::ctype) -> c_int; 
@@ -223,11 +223,11 @@ pub mod c {
         pub fn slk_clear () -> c_int; 
         pub fn slk_color (s0: c_short) -> c_int; 
         pub fn slk_init (n0: c_int) -> c_int; 
-        pub fn slk_label (n0: c_int) -> *char; 
+        pub fn slk_label (n0: c_int) -> *c_char; 
         pub fn slk_noutrefresh () -> c_int; 
         pub fn slk_refresh () -> c_int; 
         pub fn slk_restore () -> c_int; 
-        pub fn slk_set (n0: c_int, c1: *char, c2: c_int) -> c_int; 
+        pub fn slk_set (n0: c_int, c1: *c_char, c2: c_int) -> c_int; 
         pub fn slk_touch () -> c_int; 
         pub fn standout () -> c_int; 
         pub fn standend () -> c_int; 
@@ -236,7 +236,7 @@ pub mod c {
         pub fn subwin (win: *t::WINDOW, n1: c_int, c2: c_int, c3: c_int, n4: c_int) -> *t::WINDOW; 
         pub fn syncok (win: *t::WINDOW, b1: bool) -> c_int; 
         pub fn termattrs () -> t::chtype; 
-        pub fn termname () -> *char; 
+        pub fn termname () -> *c_char; 
         pub fn timeout (n0: c_int) -> c_void; 
         pub fn touchline (win: *t::WINDOW, n1: c_int, c2: c_int) -> c_int; 
         pub fn touchwin (win: *t::WINDOW) -> c_int; 
@@ -247,15 +247,15 @@ pub mod c {
         pub fn vidattr (ch0: t::ctype) -> c_int; 
         pub fn vidputs (ch0: t::ctype) -> c_int; 
         pub fn vline (ch0: t::ctype, n1: c_int) -> c_int; 
-        pub fn vwprintw (win: *t::WINDOW, c1: *char, va2: t::va_list) -> c_int; 
-        pub fn vw_printw (win: *t::WINDOW, c1: *char, va2: t::va_list) -> c_int; 
-        pub fn vwscanw (win: *t::WINDOW, c1: *char, va2: t::va_list) -> c_int; 
-        pub fn vw_scanw (win: *t::WINDOW, c1: *char, va2: t::va_list) -> c_int; 
+        pub fn vwprintw (win: *t::WINDOW, c1: *c_char, va2: t::va_list) -> c_int; 
+        pub fn vw_printw (win: *t::WINDOW, c1: *c_char, va2: t::va_list) -> c_int; 
+        pub fn vwscanw (win: *t::WINDOW, c1: *c_char, va2: t::va_list) -> c_int; 
+        pub fn vw_scanw (win: *t::WINDOW, c1: *c_char, va2: t::va_list) -> c_int; 
         pub fn waddch (win: *t::WINDOW, c1: t::chtype) -> c_int; 
         pub fn waddchnstr (win: *t::WINDOW, ch1: *t::chtype, c2: c_int) -> c_int; 
         pub fn waddchstr (win: *t::WINDOW, ch1: *t::chtype) -> c_int; 
-        pub fn waddnstr (win: *t::WINDOW, c1: *char, c2: c_int) -> c_int; 
-        pub fn waddstr (win: *t::WINDOW, c1: *char) -> c_int; 
+        pub fn waddnstr (win: *t::WINDOW, c1: *c_char, c2: c_int) -> c_int; 
+        pub fn waddstr (win: *t::WINDOW, c1: *c_char) -> c_int; 
         pub fn wattron (win: *t::WINDOW, n1: c_int) -> c_int; 
         pub fn wattroff (win: *t::WINDOW, n1: c_int) -> c_int; 
         pub fn wattrset (win: *t::WINDOW, n1: c_int) -> c_int; 
@@ -278,25 +278,25 @@ pub mod c {
         pub fn wechochar (win: *t::WINDOW, c1: t::chtype) -> c_int; 
         pub fn werase (win: *t::WINDOW) -> c_int; 
         pub fn wgetch (win: *t::WINDOW) -> c_int; 
-        pub fn wgetnstr (win: *t::WINDOW, c1: *char, c2: c_int) -> c_int; 
-        pub fn wgetstr (win: *t::WINDOW, c1: *char) -> c_int; 
+        pub fn wgetnstr (win: *t::WINDOW, c1: *c_char, c2: c_int) -> c_int; 
+        pub fn wgetstr (win: *t::WINDOW, c1: *c_char) -> c_int; 
         pub fn whline (win: *t::WINDOW, c1: t::chtype, c2: c_int) -> c_int; 
         pub fn winch (win: *t::WINDOW) -> t::chtype; 
         pub fn winchnstr (win: *t::WINDOW, ch1: *t::chtype, c2: c_int) -> c_int; 
         pub fn winchstr (win: *t::WINDOW, ch1: *t::chtype) -> c_int; 
-        pub fn winnstr (win: *t::WINDOW, c1: *char, c2: c_int) -> c_int; 
+        pub fn winnstr (win: *t::WINDOW, c1: *c_char, c2: c_int) -> c_int; 
         pub fn winsch (win: *t::WINDOW, c1: t::chtype) -> c_int; 
         pub fn winsdelln (win: *t::WINDOW, n1: c_int) -> c_int; 
         pub fn winsertln (win: *t::WINDOW) -> c_int; 
-        pub fn winsnstr (win: *t::WINDOW, c1: *char, c2: c_int) -> c_int; 
-        pub fn winsstr (win: *t::WINDOW, c1: *char) -> c_int; 
-        pub fn winstr (win: *t::WINDOW, c1: *char) -> c_int; 
+        pub fn winsnstr (win: *t::WINDOW, c1: *c_char, c2: c_int) -> c_int; 
+        pub fn winsstr (win: *t::WINDOW, c1: *c_char) -> c_int; 
+        pub fn winstr (win: *t::WINDOW, c1: *c_char) -> c_int; 
         pub fn wmove (win: *t::WINDOW, n1: c_int, c2: c_int) -> c_int; 
         pub fn wnoutrefresh (win: *t::WINDOW) -> c_int; 
-        //pub fn wprc_intw (win: *t::WINDOW, c1: *char二...); 
+        //pub fn wprc_intw (win: *t::WINDOW, c1: *c_char二...); 
         pub fn wredrawln (win: *t::WINDOW, n1: c_int, c2: c_int) -> c_int; 
         pub fn wrefresh (win: *t::WINDOW) -> c_int; 
-        //pub fn wscanw (win: *t::WINDOW, c1: *char二...); 
+        //pub fn wscanw (win: *t::WINDOW, c1: *c_char二...); 
         pub fn wscrl (win: *t::WINDOW, n1: c_int) -> c_int; 
         pub fn wsetscrreg (win: *t::WINDOW, n1: c_int, c2: c_int) -> c_int; 
         pub fn wstandout (win: *t::WINDOW) -> c_int; 
@@ -306,15 +306,15 @@ pub mod c {
         pub fn wtimeout (win: *t::WINDOW, n1: c_int) -> c_void; 
         pub fn wtouchln (win: *t::WINDOW, n1: c_int, c2: c_int, c3: c_int) -> c_int; 
         pub fn wvline (win: *t::WINDOW, c1: t::chtype, c2: c_int) -> c_int; 
-        pub fn tigetflag (c0: *char) -> c_int; 
-        pub fn tigetnum (c0: *char) -> c_int; 
-        pub fn tigetstr (c0: *char) -> *char; 
-        pub fn putp (c: *char) -> c_int; 
-        //pub fn tparm (c0: *char一...) -> *char; 
-        pub fn tparm (c0: *char, l1: c_long, l2: c_long, l3: c_long, l4: c_long, 
-                      l5: c_long, l6: c_long, l7: c_long, l8: c_long, l9: c_long) -> *char; 
-        //pub fn tparm_varargs (c0: *char一...) -> *char; 
-        //pub fn tiparm (c: *char一...) -> *char; 
+        pub fn tigetflag (c0: *c_char) -> c_int; 
+        pub fn tigetnum (c0: *c_char) -> c_int; 
+        pub fn tigetstr (c0: *c_char) -> *c_char; 
+        pub fn putp (c: *c_char) -> c_int; 
+        //pub fn tparm (c0: *c_char一...) -> *c_char; 
+        pub fn tparm (c0: *c_char, l1: c_long, l2: c_long, l3: c_long, l4: c_long, 
+                      l5: c_long, l6: c_long, l7: c_long, l8: c_long, l9: c_long) -> *c_char; 
+        //pub fn tparm_varargs (c0: *c_char一...) -> *c_char; 
+        //pub fn tiparm (c: *c_char一...) -> *c_char; 
         pub fn getattrs (win: *t::WINDOW) -> c_int; 
         pub fn getcurx (win: *t::WINDOW) -> c_int; 
         pub fn getcury (win: *t::WINDOW) -> c_int; 
@@ -325,12 +325,12 @@ pub mod c {
         pub fn getparx (win: *t::WINDOW) -> c_int; 
         pub fn getpary (win: *t::WINDOW) -> c_int; 
         pub fn is_term_resized (n0: c_int, n1: c_int) -> bool; 
-        // dup pub fn keybound (n0: c_int, n1: c_int) -> *char; 
-        pub fn curses_version () -> *char; 
+        // dup pub fn keybound (n0: c_int, n1: c_int) -> *c_char; 
+        pub fn curses_version () -> *c_char; 
         pub fn assume_default_colors (n0: c_int, n1: c_int) -> c_int; 
-        pub fn define_key (c: *char, n1: c_int) -> c_int; 
+        pub fn define_key (c: *c_char, n1: c_int) -> c_int; 
         pub fn get_escdelay () -> c_int; 
-        pub fn key_defined (c: *char) -> c_int; 
+        pub fn key_defined (c: *c_char) -> c_int; 
         pub fn keyok (n0: c_int, b1: bool) -> c_int; 
         pub fn resize_term (n0: c_int, n1: c_int) -> c_int; 
         pub fn resizeterm (n0: c_int, n1: c_int) -> c_int; 
@@ -391,6 +391,16 @@ pub fn scr_dump (filename: ~str) -> i32 {
         c::scr_dump(bs)
     }
 }
+
+
+    // /// "Set the 'background' set of attributes to attr. This set is
+    // /// initially 0 (no attributes)."]
+    // fn attrset(self, attr: u32) {
+    //     unsafe {
+    //         ncurses::attrset(attr as c_int);
+    //     }
+    // }
+
 
 
 static A_NORMAL: u32 =     0;

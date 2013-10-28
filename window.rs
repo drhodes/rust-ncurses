@@ -403,17 +403,21 @@ impl Window {
             c::mvwaddchstr(self.win, y, x, cs)
         }
     }
+
+    
     #[fixed_stack_segment]
-    pub fn mvwaddnstr (&self,  n1: i32, c2: i32, c3: *char, n4: i32) -> i32 {
+    pub fn mvwaddnstr (&self, n1: i32, c2: i32, s: ~str, n4: i32) -> i32 {
         unsafe{
-            c::mvwaddnstr (self.win, n1, c2, c3, n4)
+            let cs = s.to_c_str().unwrap();
+            c::mvwaddnstr (self.win, n1, c2, cs, n4)
         }
     }
 
     #[fixed_stack_segment]
-    pub fn mvwaddstr (&self,  n1: i32, c2: i32, c3: *char) -> i32 {
+    pub fn mvwaddstr (&self, y: i32, x: i32,  s: ~str) -> i32 {
         unsafe{
-            c::mvwaddstr(self.win,  n1, c2, c3)
+            let cs = s.to_c_str().unwrap();
+            c::mvwaddstr(self.win, y, x, cs)
         }
     }
 
@@ -445,9 +449,10 @@ impl Window {
     /// return) causes a beep. Function keys also cause a beep and are
     /// ignored.
     #[fixed_stack_segment]
-    pub fn mvwgetnstr (&self,  n1: i32, c2: i32, c3: *char, n4: i32) -> i32 {
+    pub fn mvwgetnstr (&self,  n1: i32, c2: i32, s: ~str, n4: i32) -> i32 {
         unsafe{
-            c::mvwgetnstr(self.win, n1, c2, c3, n4)
+            let cs = s.to_c_str().unwrap();
+            c::mvwgetnstr(self.win, n1, c2, cs, n4)
         }
     }
 
@@ -475,9 +480,10 @@ impl Window {
     }
 
     #[fixed_stack_segment]
-    pub fn mvwgetstr (&self, n1: i32, c2: i32, c3: *char) -> i32 {
+    pub fn mvwgetstr (&self, n1: i32, c2: i32, s: ~str) -> i32 {
         unsafe {
-            c::mvwgetstr(self.win, n1, c2, c3)
+            let cs = s.to_c_str().unwrap();
+            c::mvwgetstr(self.win, n1, c2, cs)
         }
     }
     
@@ -525,148 +531,545 @@ impl Window {
             c::mvwinchstr(self.win, n1, c2, ch3)
         }
     }
-
     #[fixed_stack_segment]
-    pub fn mvwinnstr (&self, n1: i32, c2: i32, c3: *char, n4: i32) -> i32 {
+    pub fn mvwinnstr (&self, n1: i32, c2: i32, s: ~str, n4: i32) -> i32 {
         unsafe {
-            c::mvwinnstr(self.win, n1, c2, c3, n4)
+            let cs = s.to_c_str().unwrap();           
+            c::mvwinnstr(self.win, n1, c2, cs, n4)
         }
     }
-    
     #[fixed_stack_segment]
     pub fn mvwinchnstr (&self, c1: i32, c2: i32,  ch3: *t::chtype, n4: i32) -> i32 {
         unsafe {
             c::mvwinchnstr(self.win, c1, c2, ch3, n4)
         }
     }
+    #[fixed_stack_segment]
+    pub fn mvwinsnstr (&self, n1: i32, c2: i32, c3: ~str, n4: i32) -> i32 {
+        unsafe {
+            let cs = c3.to_c_str().unwrap();
+            c::mvwinsnstr(self.win, n1, c2, cs, n4)
+        }
+    }
+    #[fixed_stack_segment]
+    pub fn mvwinsstr (&self, y: i32, x: i32, s: ~str) -> i32 {
+        unsafe {
+            let cs = s.to_c_str().unwrap();
+            c::mvwinsstr(self.win, y, x, cs as *c_char)
+        }
+    }
+    #[fixed_stack_segment]
+    pub fn mvwinstr (&self, y: i32, x: i32, s: ~str) -> i32 {
+        unsafe {
+            let cs = s.to_c_str().unwrap();
+            c::mvwinstr(self.win, y, x , cs as *c_char)
+        }
+    }
+
+    #[fixed_stack_segment] 
+    pub fn getcurx(&self) -> i32 {
+        unsafe {
+            c::getcurx(self.win)
+        }
+    }
+    #[fixed_stack_segment] 
+    pub fn getcury(&self) -> i32 {
+        unsafe {
+            c::getcury(self.win)
+        }
+    }
+    #[fixed_stack_segment] 
+    pub fn getbegx(&self) -> i32 {
+        unsafe {
+            c::getbegx(self.win)
+        }
+    }
+    #[fixed_stack_segment] 
+    pub fn getbegy(&self) -> i32 {
+        unsafe {
+            c::getbegy(self.win)
+        }
+    }
+    #[fixed_stack_segment] 
+    pub fn getparx(&self) -> i32 {
+        unsafe {
+            c::getparx(self.win)
+        }
+    }
+    #[fixed_stack_segment] 
+    pub fn getpary(&self) -> i32 {
+        unsafe {
+            c::getpary(self.win)
+        }
+    }
+    #[fixed_stack_segment] 
+    pub fn wstandout(&self) -> i32 {
+        unsafe {
+            c::wstandout(self.win)
+        }
+    }
+    #[fixed_stack_segment] 
+    pub fn wstandend(&self) -> i32 {
+        unsafe {
+            c::wstandend(self.win)
+        }
+    }
+    #[fixed_stack_segment] 
+    pub fn wclear(&self) -> i32 {
+        unsafe {
+            c::wclear(self.win)
+        }
+    }
+    #[fixed_stack_segment] 
+    pub fn wclrtobot(&self) -> i32 {
+        unsafe {
+            c::wclrtobot(self.win)
+        }
+    }
+    #[fixed_stack_segment] 
+    pub fn wclrtoeol(&self) -> i32 {
+        unsafe {
+            c::wclrtoeol(self.win)
+        }
+    }
+    #[fixed_stack_segment] 
+    pub fn wdelch(&self) -> i32 {
+        unsafe {
+            c::wdelch(self.win)
+        }
+    }
+    #[fixed_stack_segment] 
+    pub fn wdeleteln(&self) -> i32 {
+        unsafe {
+            c::wdeleteln(self.win)
+        }
+    }
+    #[fixed_stack_segment] 
+    pub fn wrefresh(&self) -> i32 {
+        unsafe {
+            c::wrefresh(self.win)
+        }
+    }
+    #[fixed_stack_segment] 
+    pub fn redrawwin(&self) -> i32 {
+        unsafe {
+            c::redrawwin(self.win)
+        }
+    }
+    #[fixed_stack_segment] 
+    pub fn touchwin(&self) -> i32 {
+        unsafe {
+            c::touchwin(self.win)
+        }
+    }
+    #[fixed_stack_segment] 
+    pub fn untouchwin(&self) -> i32 {
+        unsafe {
+            c::untouchwin(self.win)
+        }
+    }
+    #[fixed_stack_segment] 
+    pub fn werase(&self) -> i32 {
+        unsafe {
+            c::werase(self.win)
+        }
+    }
+    #[fixed_stack_segment] 
+    pub fn wgetch(&self) -> i32 {
+        unsafe {
+            c::wgetch(self.win)
+        }
+    }
+    #[fixed_stack_segment] 
+    pub fn winsertln(&self) -> i32 {
+        unsafe {
+            c::winsertln(self.win)
+        }
+    }
+    #[fixed_stack_segment] 
+    pub fn wnoutrefresh(&self) -> i32 {
+        unsafe {
+            c::wnoutrefresh(self.win)
+        }
+    }
+
+
 
     #[fixed_stack_segment]
-    pub fn mvwinsnstr (&self, n1: i32, c2: i32, c3: *char, n4: i32) -> i32 {
+    pub fn overlay(&self, other: Window) -> i32 {
         unsafe {
-            c::mvwinsnstr(self.win, n1, c2, c3, n4)
+            c::overlay(self.win, other.win)
+        }
+    }
+    #[fixed_stack_segment]
+    pub fn overwrite(&self, other: Window) -> i32 {
+        unsafe {
+            c::overwrite(self.win, other.win)
+        }
+    }
+
+    // [u8]?
+    // #[fixed_stack_segment]
+    // pub fn wcolor_set(&self, s1: c_short, v2: *c_void) -> i32 {
+    //     unsafe {
+    //         c::wcolor_set(self.win, s1, )
+    //     }
+    // }
+
+    #[fixed_stack_segment]
+    pub fn pnoutrefresh(&self, n1: i32, c2: i32, c3: i32, c4: i32, c5: i32, c6: i32) -> i32 {
+        unsafe {
+            c::pnoutrefresh(self.win, n1, c2, c3, c4, c5, c6)
         }
     }
 
 
     #[fixed_stack_segment]
-    pub fn mvwinsstr (&self, n1: i32, c2: i32, c3: *char) -> i32 {
+    pub fn pechochar(&self, c1: t::chtype) -> i32 {
         unsafe {
-            c::mvwinsstr(self.win, n1, c2, c3)
+            c::pechochar(self.win, c1)
         }
     }
 
     #[fixed_stack_segment]
-    pub fn mvwinstr (&self, n1: i32, c2: i32, c3: *char) -> i32 {
+    pub fn prefresh(&self, n1: i32, c2: i32, c3: i32, c4: i32, c5: i32, c6: i32) -> i32 {
         unsafe {
-            c::mvwinstr(self.win, n1, c2, c3)
+            c::prefresh(self.win, n1, c2, c3, c4, c5, c6)
         }
     }
 
+    #[fixed_stack_segment]
+    pub fn scrollok(&self, b1: bool) -> i32 {
+        unsafe {
+            c::scrollok(self.win, b1)
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn subpad(&self, n1: i32, c2: i32, c3: i32, n4: i32) -> Window {
+        unsafe {
+            Window{win: c::subpad(self.win, n1, c2, c3, n4)}
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn subwin(&self, n1: i32, c2: i32, c3: i32, n4: i32) -> Window {
+        unsafe {
+            Window{win: c::subwin(self.win, n1,c2,c3,n4)}
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn syncok(&self, b1: bool) -> i32 {
+        unsafe {
+            c::syncok(self.win, b1)
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn touchline(&self, n1: i32, c2: i32) -> i32 {
+        unsafe {
+            c::touchline(self.win, n1, c2)
+        }
+    }
+
+    // VARARGS CONUNDRUM
+    /*
+
+    // #[fixed_stack_segment]
+    // pub fn vwprintw(&self, c1: *char, va2: t::va_list) -> i32 {
+    //     unsafe {
+    //         c::vwprintw(self.win, c1, va2)
+    //     }
+    // }
+
+    // #[fixed_stack_segment]
+    // pub fn vw_printw(&self, s: ~str, va2: t::va_list) -> i32 {
+    //     unsafe {
+    //         let cs = s.to_c_str().unwrap();
+    //         c::vw_printw(self.win, cs, va2)
+    //     }
+    // }
+
+    #[fixed_stack_segment]
+    pub fn vwscanw(&self, s: ~str, va2: t::va_list) -> i32 {
+        unsafe {
+            let cs = s.to_c_str().unwrap();
+
+            match len
+
+
+            c::vwscanw(self.win, cs, va2)
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn vw_scanw(&self, c1: *char, va2: t::va_list) -> i32 {
+    unsafe {
+    c::vw_scanw(self.win)
+}
 }
 
 
 
-/*
-        //pub fn mvwprc_intw (win0: *t::WINDOW, n1: c_int, c2: c_int, c3: *char四...); 
-        pub fn overlay (win0: *t::WINDOW, win: *t::WINDOW) -> c_int; 
-        pub fn overwrite (win0: *t::WINDOW, win: *t::WINDOW) -> c_int; 
-        pub fn pechochar (win: *t::WINDOW, c1: t::chtype) -> c_int; 
-        pub fn pnoutrefresh (win0: *t::WINDOW, n1: c_int, c2: c_int, c3: c_int, 
-        pub fn prefresh (win: *t::WINDOW, n1: c_int, c2: c_int, c3: c_int, 
-        // pub fn extern NCURSES_EXPORT(n0: c_int) putwin (win: *t::WINDOW一*FILE) -> c_int; 
-        pub fn redrawwin (win: *t::WINDOW) -> c_int; 
-        //pub fn ripoffline (n0: c_int, n1: c_int (*)(win: *t::WINDOW, c2: c_int)) -> c_int;  todo functio        pub fn scroll (win: *t::WINDOW) -> c_int; 
-        pub fn scrollok (win: *t::WINDOW, b1: bool) -> c_int; 
-        pub fn subpad (win: *t::WINDOW, n1: c_int, c2: c_int, c3: c_int, n4: c_int) -> *t::WINDOW; 
-        pub fn subwin (win: *t::WINDOW, n1: c_int, c2: c_int, c3: c_int, n4: c_int) -> *t::WINDOW; 
-        pub fn syncok (win: *t::WINDOW, b1: bool) -> c_int; 
-        pub fn touchline (win: *t::WINDOW, n1: c_int, c2: c_int) -> c_int; 
-        pub fn touchwin (win: *t::WINDOW) -> c_int; 
-        pub fn untouchwin (win: *t::WINDOW) -> c_int; 
-        pub fn vwprintw (win: *t::WINDOW, c1: *char, va2: t::va_list) -> c_int; 
-        pub fn vw_printw (win: *t::WINDOW, c1: *char, va2: t::va_list) -> c_int; 
-        pub fn vwscanw (win: *t::WINDOW, c1: *char, va2: t::va_list) -> c_int; 
-        pub fn vw_scanw (win: *t::WINDOW, c1: *char, va2: t::va_list) -> c_int; 
-        pub fn waddch (win: *t::WINDOW, c1: t::chtype) -> c_int; 
-        pub fn waddchnstr (win: *t::WINDOW, ch1: *t::chtype, c2: c_int) -> c_int; 
-        pub fn waddchstr (win: *t::WINDOW, ch1: *t::chtype) -> c_int; 
-        pub fn waddnstr (win: *t::WINDOW, c1: *char, c2: c_int) -> c_int; 
-        pub fn waddstr (win: *t::WINDOW, c1: *char) -> c_int; 
-        pub fn wattron (win: *t::WINDOW, n1: c_int) -> c_int; 
-        pub fn wattroff (win: *t::WINDOW, n1: c_int) -> c_int; 
-        pub fn wattrset (win: *t::WINDOW, n1: c_int) -> c_int; 
-        pub fn wattr_get (win: *t::WINDOW, at1: *t::attr_t, s2: *c_short, v3: *c_void) -> c_int; 
-        pub fn wattr_on (win: *t::WINDOW, at2: t::attr_t, v2: *c_void) -> c_int; 
-        pub fn wattr_off (win: *t::WINDOW, at2: t::attr_t, v2: *c_void) -> c_int; 
-        pub fn wattr_set (win: *t::WINDOW, at2: t::attr_t, s2: c_short, v3: *c_void) -> c_int; 
-        pub fn wbkgd (win: *t::WINDOW, c1: t::chtype) -> c_int; 
-        pub fn wbkgdset (win: *t::WINDOW, c1: t::chtype) -> c_void; 
-        pub fn wborder (win: *t::WINDOW, c1: t::chtype, c2: t::chtype, ch3: t::chtype, ch4: t::chtype,
-        pub fn wchgat (win: *t::WINDOW, n1: c_int, at: t::attr_t, s3: c_short, v: *c_void) -> c_int; 
-        pub fn wclear (win: *t::WINDOW) -> c_int; 
-        pub fn wclrtobot (win: *t::WINDOW) -> c_int; 
-        pub fn wclrtoeol (win: *t::WINDOW) -> c_int; 
-        pub fn wcolor_set (win0: *t::WINDOW, s1: c_short, v2: *c_void) -> c_int; 
-        pub fn wcursyncup (win: *t::WINDOW) -> c_void; 
-        pub fn wdelch (win: *t::WINDOW) -> c_int; 
-        pub fn wdeleteln (win: *t::WINDOW) -> c_int; 
-        pub fn wechochar (win: *t::WINDOW, c1: t::chtype) -> c_int; 
-        pub fn werase (win: *t::WINDOW) -> c_int; 
-        pub fn wgetch (win: *t::WINDOW) -> c_int; 
-        pub fn wgetnstr (win: *t::WINDOW, c1: *char, c2: c_int) -> c_int; 
-        pub fn wgetstr (win: *t::WINDOW, c1: *char) -> c_int; 
-        pub fn whline (win: *t::WINDOW, c1: t::chtype, c2: c_int) -> c_int; 
-        pub fn winch (win: *t::WINDOW) -> t::chtype; 
-        pub fn winchnstr (win: *t::WINDOW, ch1: *t::chtype, c2: c_int) -> c_int; 
-        pub fn winchstr (win: *t::WINDOW, ch1: *t::chtype) -> c_int; 
-        pub fn winnstr (win: *t::WINDOW, c1: *char, c2: c_int) -> c_int; 
-        pub fn winsch (win: *t::WINDOW, c1: t::chtype) -> c_int; 
-        pub fn winsdelln (win: *t::WINDOW, n1: c_int) -> c_int; 
-        pub fn winsertln (win: *t::WINDOW) -> c_int; 
-        pub fn winsnstr (win: *t::WINDOW, c1: *char, c2: c_int) -> c_int; 
-        pub fn winsstr (win: *t::WINDOW, c1: *char) -> c_int; 
-        pub fn winstr (win: *t::WINDOW, c1: *char) -> c_int; 
-        pub fn wmove (win: *t::WINDOW, n1: c_int, c2: c_int) -> c_int; 
-        pub fn wnoutrefresh (win: *t::WINDOW) -> c_int; 
-        //pub fn wprc_intw (win: *t::WINDOW, c1: *char二...); 
-        pub fn wredrawln (win: *t::WINDOW, n1: c_int, c2: c_int) -> c_int; 
-        pub fn wrefresh (win: *t::WINDOW) -> c_int; 
-        //pub fn wscanw (win: *t::WINDOW, c1: *char二...); 
-        pub fn wscrl (win: *t::WINDOW, n1: c_int) -> c_int; 
-        pub fn wsetscrreg (win: *t::WINDOW, n1: c_int, c2: c_int) -> c_int; 
-        pub fn wstandout (win: *t::WINDOW) -> c_int; 
-        pub fn wstandend (win: *t::WINDOW) -> c_int; 
-        pub fn wsyncdown (win: *t::WINDOW) -> c_void; 
-        pub fn wsyncup (win: *t::WINDOW) -> c_void; 
-        pub fn wtimeout (win: *t::WINDOW, n1: c_int) -> c_void; 
-        pub fn wtouchln (win: *t::WINDOW, n1: c_int, c2: c_int, c3: c_int) -> c_int; 
-        pub fn wvline (win: *t::WINDOW, c1: t::chtype, c2: c_int) -> c_int; 
-        pub fn getattrs (win: *t::WINDOW) -> c_int; 
-        pub fn getcurx (win: *t::WINDOW) -> c_int; 
-        pub fn getcury (win: *t::WINDOW) -> c_int; 
-        pub fn getbegx (win: *t::WINDOW) -> c_int; 
-        pub fn getbegy (win: *t::WINDOW) -> c_int; 
-        pub fn getparx (win: *t::WINDOW) -> c_int; 
-        pub fn getpary (win: *t::WINDOW) -> c_int; 
-        pub fn use_window (win: *t::WINDOW, c1: t::WINDOW_CB, v2: *c_void) -> c_int; 
-        pub fn wresize (win: *t::WINDOW, n1: c_int, c2: c_int) -> c_int; 
-        pub fn wgetparent (win: *t::WINDOW) -> *t::WINDOW; 
-*/
-
-
-
-
-
-
-/*
-
-
-    /// "Set the 'background' set of attributes to attr. This set is
-    /// initially 0 (no attributes)."]
-    fn attrset(self, attr: u32) {
+    -- END VARARGS CONUNDRUM
+     */
+    
+    #[fixed_stack_segment]
+    pub fn waddch(&self, c1: t::chtype) -> i32 {
         unsafe {
-            ncurses::attrset(attr as c_int);
+            c::waddch(self.win, c1)
         }
     }
+
+    #[fixed_stack_segment]
+    pub fn waddchnstr(&self, ch1: *t::chtype, c2: i32) -> i32 {
+        unsafe {
+            c::waddchnstr(self.win, ch1, c2)
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn waddchstr(&self, ch1: *t::chtype) -> i32 {
+        unsafe {
+            c::waddchstr(self.win, ch1)
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn waddnstr(&self, s: ~str, c2: i32) -> i32 {
+        unsafe {
+            let cs = s.to_c_str().unwrap();
+            c::waddnstr(self.win, cs, c2)
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn waddstr(&self, s: ~str) -> i32 {
+        unsafe {
+            let cs = s.to_c_str().unwrap();
+            c::waddstr(self.win, cs)
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn wattron(&self, n1: i32) -> i32 {
+        unsafe {
+            c::wattron(self.win, n1)
+        }
+    }
+    #[fixed_stack_segment]
+    pub fn wattroff(&self, n1: i32) -> i32 {
+        unsafe {
+            c::wattroff(self.win, n1)
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn wattrset(&self, n1: i32) -> i32 {
+        unsafe {
+            c::wattrset(self.win, n1)
+        }
+    }
+
+    // how to deal with void? &mut [u8] ?
+    // #[fixed_stack_segment]
+    // pub fn wattr_get(&self, at1: *t::attr_t, s2: *c_short, v3: *c_void) -> i32 {
+    //     unsafe {
+    //         c::wattr_get(self.win, at1, s2, v3)
+    //     }
+    // }
+    // #[fixed_stack_segment]
+    // pub fn wattr_on(&self, at2: t::attr_t, v2: *c_void) -> i32 {
+    //     unsafe {
+    //         c::wattr_on(self.win, at2)
+    //     }
+    // }
+    // #[fixed_stack_segment]
+    // pub fn wattr_off(&self, at2: t::attr_t, v2: *c_void) -> i32 {
+    //     unsafe {
+    //         c::wattr_off(self.win)
+    //     }
+    // }
+    // #[fixed_stack_segment]
+    // pub fn wattr_set(&self, at2: t::attr_t, s2: c_short, v3: *c_void) -> i32 {
+    //     unsafe {
+    //         c::wattr_set(self.win)
+    //     }
+    // }
+
+    #[fixed_stack_segment]
+    pub fn wbkgd(&self, c1: t::chtype) -> i32 {
+        unsafe {
+            c::wbkgd(self.win, c1)
+        }
+    }
+    #[fixed_stack_segment]
+    pub fn wbkgdset(&self, c1: t::chtype) -> c_void {
+        unsafe {
+            c::wbkgdset(self.win, c1)
+        }
+    }
+
+    // #[fixed_stack_segment]
+    // pub fn wchgat(&self, n1: i32, at: t::attr_t, s3: c_short, v: *c_void) -> i32 {
+    //     unsafe {
+    //         c::wchgat(self.win, n1, at, s4)
+    //     }
+    // }
+
+    #[fixed_stack_segment]
+    pub fn wechochar(&self, c1: t::chtype) -> i32 {
+        unsafe {
+            c::wechochar(self.win, c1)
+        }
+    }
+    #[fixed_stack_segment]
+    pub fn wgetnstr(&self, s: ~str, c2: i32) -> i32 {
+        unsafe {
+            let cs = s.to_c_str().unwrap();
+            c::wgetnstr(self.win, cs, c2)
+        }
+    }
+    #[fixed_stack_segment]
+    pub fn wgetstr(&self, s: ~str) -> i32 {
+        unsafe {
+            let cs = s.to_c_str().unwrap();
+            c::wgetstr(self.win, cs)
+        }
+    }
+    #[fixed_stack_segment]
+    pub fn whline(&self, c1: t::chtype, c2: i32) -> i32 {
+        unsafe {
+            c::whline(self.win, c1, c2)
+        }
+    }
+    #[fixed_stack_segment]
+    pub fn winchnstr(&self, ch1: *t::chtype, c2: i32) -> i32 {
+        unsafe {
+            c::winchnstr(self.win, ch1, c2)
+        }
+    }
+    #[fixed_stack_segment]
+    pub fn winchstr(&self, ch1: *t::chtype) -> i32 {
+        unsafe {
+            c::winchstr(self.win, ch1)
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn winnstr(&self, s: ~str, c2: i32) -> i32 {
+        unsafe {
+            let cs = s.to_c_str().unwrap();
+            c::winnstr(self.win, cs, c2)
+        }
+    }
+
+    #[fixed_stack_segment]
+    pub fn winsch(&self, c1: t::chtype) -> i32 {
+        unsafe {
+            c::winsch(self.win, c1)
+        }
+    }
+    #[fixed_stack_segment]
+    pub fn winsdelln(&self, n1: i32) -> i32 {
+        unsafe {
+            c::winsdelln(self.win, n1)
+        }
+    }
+    #[fixed_stack_segment]
+    pub fn winsnstr(&self, s: ~str, c2: i32) -> i32 {
+        unsafe {
+            let cs = s.to_c_str().unwrap();
+            c::winsnstr(self.win, cs,c2)
+        }
+    }
+    #[fixed_stack_segment]
+    pub fn winsstr(&self, s: ~str) -> i32 {
+        unsafe {
+            let cs = s.to_c_str().unwrap();
+            c::winsstr(self.win, cs)
+        }
+    }
+    #[fixed_stack_segment]
+    pub fn winstr(&self, s: ~str) -> i32 {
+        unsafe {
+            let cs = s.to_c_str().unwrap();
+            c::winstr(self.win, cs)
+        }
+    }
+    #[fixed_stack_segment]
+    pub fn wmove(&self, n1: i32, c2: i32) -> i32 {
+        unsafe {
+            c::wmove(self.win, n1, c2)
+        }
+    }
+    #[fixed_stack_segment]
+    pub fn wredrawln(&self, n1: i32, c2: i32) -> i32 {
+        unsafe {
+            c::wredrawln(self.win, n1, c2)
+        }
+    }
+    #[fixed_stack_segment]
+    pub fn wscrl(&self, n1: i32) -> i32 {
+        unsafe {
+            c::wscrl(self.win, n1)
+        }
+    }
+    #[fixed_stack_segment]
+    pub fn wsetscrreg(&self, n1: i32, c2: i32) -> i32 {
+        unsafe {
+            c::wsetscrreg(self.win, n1, c2)
+        }
+    }
+    #[fixed_stack_segment]
+    pub fn wtimeout(&self, n1: i32) -> c_void {
+        unsafe {
+            c::wtimeout(self.win, n1)
+        }
+    }
+    #[fixed_stack_segment]
+    pub fn wtouchln(&self, n1: i32, c2: i32, c3: i32) -> i32 {
+        unsafe {
+            c::wtouchln(self.win, n1, c2, c3)
+        }
+    }
+    #[fixed_stack_segment]
+    pub fn wvline(&self, c1: t::chtype, c2: i32) -> i32 {
+        unsafe {
+            c::wvline(self.win, c1,c2)
+        }
+    }
+
+    // #[fixed_stack_segment]
+    // pub fn mvwinstr (&self, n1: i32, c2: i32, c3: *char) -> i32 {
+    //     unsafe {
+    //         c::mvwinstr(self.win, n1, c2, c3)
+    //     }
+    // }
+
+    // pub fn winch() -> t::chtype; 
+    // pub fn wsyncup() -> c_void; 
+    // pub fn wsyncdown() -> c_void; 
+    // pub fn wcursyncup() -> c_void; 
+    // pub fn wborder(c1: t::chtype, c2: t::chtype, ch3: t::chtype, ch4: t::chtype, ch5: t::chtype, ch6: t::chtype, ch7: t::chtype, ch8: t::chtype) -> i32;     
+    // pub fn use_window(c1: t::WINDOW_CB, v2: *c_void) -> i32; 
+    // pub fn wresize(n1: i32, c2: i32) -> i32; 
+    // pub fn wgetparent() -> *t::WINDOW; 
+    // pub fn getattrs() -> i32; 
+
 }
-*/
+
+//pub fn ripoffline (n0: c_int, n1: c_int (*)(win: *t::WINDOW, c2: c_int)) -> c_int;  
+// todo functio        pub fn scroll (win: *t::WINDOW) -> c_int; 
+//pub fn wprc_intw (win: *t::WINDOW, c1: *char二...); 
+//pub fn wscanw (win: *t::WINDOW, c1: *char二...); 
+
+
+//pub fn mvwprc_intw (win0: *t::WINDOW, n1: c_int, c2: c_int, c3: *char四...); 
+// pub fn extern NCURSES_EXPORT(n0: c_int) putwin (win: *t::WINDOW一*FILE) -> c_int; 
+
+
+
+
+
