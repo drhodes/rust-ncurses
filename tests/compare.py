@@ -43,7 +43,7 @@ def verifyDimension(xs):
         return "Test files must have %d lines" % TESTHEIGHT
     for line in xs:
         if len(line) != TESTWIDTH:
-            return "Test file lines must have with of %d lines" % TESTWIDTH
+            return "Test file lines must have width of %d lines" % TESTWIDTH
     return None
 
 def boxOutput(s):
@@ -96,9 +96,9 @@ def main():
     out = open(out_path).read()
 
     if exp != out:
-        sideBySide(exp, out)
-        err("FAIL: " + testname)
-        sys.exit(1)
+        e = sideBySide(exp, out)
+        if e: err("FAIL: " + e)
+        die("FAIL: " + testname)
     else:
         err("PASS: " + testname)
 

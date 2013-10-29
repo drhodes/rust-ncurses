@@ -7,7 +7,7 @@ build: lib
 	rustc ${SAFETY} --bin crate.rs --test -o testbin
 
 test: 
-	./testbin
+	./testbin && cd tests 
 
 lib:
 	rustc ${SAFETY} --lib crate.rs -A unused_imports

@@ -13,6 +13,18 @@ pub enum SCREEN_CB{}
 pub enum WINDOW_CB{}
 pub enum MEVENT{}
 pub enum va_list{}
+
+/// chtype: An integral type that can contain at least an unsigned char
+/// and attributes. Values of type chtype are formed by OR-ing together an
+/// unsigned char value and zero or more of the base attribute flags
+/// defined in that have the A_ prefix. The application can extract these
+/// components of a chtype value using the base masks defined in
+/// <curses.h> for this purpose. The chtype data type also contains a
+/// colour-pair. Values of type chtype are formed by OR-ing together an
+/// unsigned char value, a colour pair, and zero or more of the attributes
+/// defined in <curses.h> that begin with the prefix A_. The application
+/// can extract these components of a chtype value using the masks defined
+/// in <curses.h> for this purpose.
 pub type chtype = u32;
 
 pub static TRUE: c_int = 1;

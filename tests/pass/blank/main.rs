@@ -3,7 +3,7 @@ extern mod ncurses;
 use nc = ncurses::ncurses;
 // use t = ncurses::types;
 use ncurses::window::{newwin, initscr};
-use ncurses::window::Window;
+//use ncurses::window::Window;
 
 fn main() {
     // Start curses mode            

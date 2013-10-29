@@ -68,8 +68,6 @@ impl Window {
         let p = &Path::new(filename);
         let mut of = io::file::open(p, io::Create, io::Write).unwrap();
 
-        error!("{}, {}", bottom, right);
-
         // when chtype is understood better 
         // conform these to chars, not [u8]s
         let mut bs: ~[u8] = ~[];
@@ -88,12 +86,12 @@ impl Window {
         }
         of.write(bs);        
     }   
-   
 
+    /// does this work?
     #[fixed_stack_segment]    
-    pub fn addch(&self, ch: t::chtype) -> int {        
+    pub fn addch(&self, ch: char) -> int {        
         unsafe {
-            c::addch(ch) as int
+            c::addch(ch as t::chtype) as int
         }
     }
 
@@ -816,10 +814,26 @@ impl Window {
     -- END VARARGS CONUNDRUM
      */
     
+    /// The addch, waddch, mvaddch and mvwaddch routines put the character ch
+    /// into the given window at its current window position, which is then
+    /// advanced. They are analogous to putchar in stdio(3). If the advance is
+    /// at the right margin, the cursor automatically wraps to the beginning
+    /// of the next line. At the bottom of the current scrolling region, if
+    /// scrollok is enabled, the scrolling region is scrolled up one line.
     #[fixed_stack_segment]
-    pub fn waddch(&self, c1: t::chtype) -> i32 {
+    pub fn waddch(&self, c1: char) -> i32 {
         unsafe {
-            c::waddch(self.win, c1)
+            // // fn encode_utf8(&self, dst: &mut [u8]) -> uint;
+            // let mut dst = [0,0,0,0];
+            // c1.encode_utf8(dst);
+            // //error!("{} {} {} {}", dst[0], dst[1], dst[2], dst[3]);
+            // let r0 = dst[3] << 24;
+            // let r1 = dst[2] << 16;
+            // let r2 = dst[1] << 8;
+            // let r3 = dst[0];
+            // let mut r = r0 | r1 | r2 | r3;
+            // error!("{}", r);
+            c::waddch(self.win, c1 as t::chtype)
         }
     }
 
@@ -1065,9 +1079,11 @@ impl Window {
     pub fn wcursyncup(&self) {
         unsafe { c::wcursyncup(self.win); }
     }
-    // pub fn wborder(c1: t::chtype, c2: t::chtype, ch3: t::chtype, ch4: t::chtype, ch5: t::chtype, ch6: t::chtype, ch7: t::chtype, ch8: t::chtype) -> i32;     
+    
+    //pub fn wborder(c1: t::chtype, c2: t::chtype, ch3: t::chtype, ch4: t::chtype, ch5: t::chtype, ch6: t::chtype, ch7: t::chtype, ch8: t::chtype) -> i32;     
     // pub fn use_window(c1: t::WINDOW_CB, v2: *c_void) -> i32; 
     // pub fn wresize(n1: i32, c2: i32) -> i32; 
+    
 
     #[fixed_stack_segment]
     pub fn wgetparent(&self) -> Window {

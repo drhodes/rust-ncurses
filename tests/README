@@ -1,5 +1,14 @@
-Hi, these are simple tests.  For example code, check out the examples directory.
+Hi, these are simple tests.  For example code, check out the examples
+directory.
 
-I'm not sure how effective these tests will be. At least for static placement of characters it should do all right.
 
-As for automatically testing user input and other dynamic interactions ncurses affords, I haven't the slightest.
+to run tests, do
+
+$ make test
+
+
+I'm not sure how effective these tests will be. At least for static
+placement of characters it should do all right.
+
+As for automatically testing user input and other dynamic interactions
+ncurses affords, I haven't the slightest.
