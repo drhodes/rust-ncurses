@@ -27,7 +27,6 @@ impl Drop for Window {
     #[fixed_stack_segment]
     fn drop(&mut self) {
         unsafe {
-            error!("Deleting window.")
             c::delwin(self.win);
         }
     }
@@ -59,7 +58,9 @@ pub fn newwin(nlines: i32, ncols: i32,
 }
 
 impl Window {       
-    //
+    /// screenShot dumps a verbatim copy of the window to a file, with the
+    /// exception of Newlines appended to the end of rows for human
+    /// readability
     pub fn screenShot(&self, filename: ~str) {
         let bottom = self.getmaxy();        
         let right = self.getmaxx();
@@ -68,23 +69,27 @@ impl Window {
         let mut of = io::file::open(p, io::Create, io::Write).unwrap();
 
         error!("{}, {}", bottom, right);
-        
+
+        // when chtype is understood better 
+        // conform these to chars, not [u8]s
+        let mut bs: ~[u8] = ~[];
         for row in range(0, bottom) {
             for col in range(0, right) {
-                let mut bs: ~[u8] = ~[];
                 match self.mvwinch(row, col) {
                     Some(c) => {
                         bs.push(c as u8);
                     }                    
                     None => {
                         bs.push('?' as u8);
-                        }
+                    }
                 }
-                of.write(bs);
             }
+            bs.push('\n' as u8);           
         }
+        of.write(bs);        
     }   
-    
+   
+
     #[fixed_stack_segment]    
     pub fn addch(&self, ch: t::chtype) -> int {        
         unsafe {
@@ -394,8 +399,8 @@ impl Window {
     // }
 
 
-    // Not working correctly, only shows the first couple characters,
-    // then garbage.
+    /// Doesn't work, only shows the first couple characters, then garbage.
+    /// almost like it's expecting 
     #[fixed_stack_segment]
     pub fn mvwaddchstr (&self,  y: i32, x: i32, s: ~str) -> i32 {
         unsafe{
@@ -456,7 +461,7 @@ impl Window {
         }
     }
 
-    /// input a single-byte character and rendition from a window 
+    /// insert a character into the window
     #[fixed_stack_segment]
     pub fn mvwinch (&self, y: i32, x: i32) -> Option<char> {
         unsafe {
@@ -464,7 +469,7 @@ impl Window {
             from_u32(ch)
         }
     }
-
+    
     #[fixed_stack_segment]
     pub fn getmaxx (&self) -> i32 {
         unsafe {
@@ -693,8 +698,6 @@ impl Window {
         }
     }
 
-
-
     #[fixed_stack_segment]
     pub fn overlay(&self, other: Window) -> i32 {
         unsafe {
@@ -807,10 +810,8 @@ impl Window {
     pub fn vw_scanw(&self, c1: *char, va2: t::va_list) -> i32 {
     unsafe {
     c::vw_scanw(self.win)
-}
-}
-
-
+    }
+    }
 
     -- END VARARGS CONUNDRUM
      */
@@ -1048,16 +1049,40 @@ impl Window {
     //     }
     // }
 
-    // pub fn winch() -> t::chtype; 
-    // pub fn wsyncup() -> c_void; 
-    // pub fn wsyncdown() -> c_void; 
-    // pub fn wcursyncup() -> c_void; 
+    //pub fn winch() -> t::chtype; 
+
+    #[fixed_stack_segment]
+    pub fn wsyncup(&self) {
+        unsafe { c::wsyncup(self.win); }
+    }
+    
+    #[fixed_stack_segment]
+    pub fn wsyncdown(&self) {
+        unsafe { c::wsyncdown(self.win); }
+    }
+
+    #[fixed_stack_segment]
+    pub fn wcursyncup(&self) {
+        unsafe { c::wcursyncup(self.win); }
+    }
     // pub fn wborder(c1: t::chtype, c2: t::chtype, ch3: t::chtype, ch4: t::chtype, ch5: t::chtype, ch6: t::chtype, ch7: t::chtype, ch8: t::chtype) -> i32;     
     // pub fn use_window(c1: t::WINDOW_CB, v2: *c_void) -> i32; 
     // pub fn wresize(n1: i32, c2: i32) -> i32; 
-    // pub fn wgetparent() -> *t::WINDOW; 
-    // pub fn getattrs() -> i32; 
 
+    #[fixed_stack_segment]
+    pub fn wgetparent(&self) -> Window {
+        unsafe { 
+            Window{win: c::wgetparent(self.win)}
+        }
+    }
+
+    // get curses cursor and window coordinates, attributes
+    #[fixed_stack_segment]
+    pub fn getattrs(&self) -> i32 {
+        unsafe { 
+            c::getattrs(self.win) 
+        }
+    }
 }
 
 //pub fn ripoffline (n0: c_int, n1: c_int (*)(win: *t::WINDOW, c2: c_int)) -> c_int;  

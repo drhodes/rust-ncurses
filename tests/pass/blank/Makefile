@@ -1,8 +1,10 @@
 build:
 	rustc --bin main.rs -L../../
+
 test:
-	./main
+	./main	
+
 clean:
 	rm -f ./main *~
-	rm -f *.outfile
+	rm -f output
 
