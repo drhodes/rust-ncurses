@@ -3,14 +3,16 @@ SAFETY= -A unused_imports \
 		-A unused_variable \
 		-A unused_mut
 
+DEBUG= -Z debug-info
+
 build: lib
-	rustc ${SAFETY} --bin crate.rs --test -o testbin
+	rustc ${SAFETY} ${DEBUG} --bin crate.rs --test -o testbin
 
 test: 
 	./testbin && cd tests 
 
 lib:
-	rustc ${SAFETY} --lib crate.rs -A unused_imports
+	rustc ${SAFETY} ${DEBUG} --lib crate.rs -A unused_imports
 
 clean:
 	rm -f libncurses*so *~ testbin packed-docs.zip

@@ -87,14 +87,6 @@ impl Window {
         of.write(bs);        
     }   
 
-    /// does this work?
-    #[fixed_stack_segment]    
-    pub fn addch(&self, ch: char) -> int {        
-        unsafe {
-            c::addch(ch as t::chtype) as int
-        }
-    }
-
     #[fixed_stack_segment] 
     /// Endwin will clean up all allocated resources from ncurses and restore
     /// the tty modes to the status they had before calling initscr(). It must
@@ -813,13 +805,33 @@ impl Window {
 
     -- END VARARGS CONUNDRUM
      */
+
+    /*
+    ok this is the ncurses source after preprocessor
+
+    int waddch(WINDOW *win, const chtype ch) {
+      int code = (-1);
+      chtype wch;
+  
+      wch = (((ch) & (chtype)(((1U) << ((0) + 8)) - 1U))) | (((ch) & (chtype)((~(1U - 1U)) << ((0) + 8))));
+      if (win && (waddch_nosync(win, wch) != (-1))) {
+        _nc_synchook(win);
+        code = (0);
+      }
+      return (code);
+    }
+    */
     
+
     /// The addch, waddch, mvaddch and mvwaddch routines put the character ch
     /// into the given window at its current window position, which is then
     /// advanced. They are analogous to putchar in stdio(3). If the advance is
     /// at the right margin, the cursor automatically wraps to the beginning
     /// of the next line. At the bottom of the current scrolling region, if
     /// scrollok is enabled, the scrolling region is scrolled up one line.
+
+
+
     #[fixed_stack_segment]
     pub fn waddch(&self, c1: char) -> i32 {
         unsafe {
@@ -836,6 +848,7 @@ impl Window {
             c::waddch(self.win, c1 as t::chtype)
         }
     }
+
 
     #[fixed_stack_segment]
     pub fn waddchnstr(&self, ch1: *t::chtype, c2: i32) -> i32 {
@@ -981,9 +994,9 @@ impl Window {
     }
 
     #[fixed_stack_segment]
-    pub fn winsch(&self, c1: t::chtype) -> i32 {
+    pub fn winsch(&self, ch: char) -> i32 {
         unsafe {
-            c::winsch(self.win, c1)
+            c::winsch(self.win, ch as t::chtype)
         }
     }
     #[fixed_stack_segment]
@@ -1013,12 +1026,19 @@ impl Window {
             c::winstr(self.win, cs)
         }
     }
+
+    /// These routines move the cursor associated with the window to line
+    /// y and column x.  This routine does not move the physical cursor of
+    /// the terminal until refresh is called.  The position specified is
+    /// relative to the upper left-hand corner of the window, which is
+    /// (0,0).
     #[fixed_stack_segment]
     pub fn wmove(&self, n1: i32, c2: i32) -> i32 {
         unsafe {
             c::wmove(self.win, n1, c2)
         }
     }
+
     #[fixed_stack_segment]
     pub fn wredrawln(&self, n1: i32, c2: i32) -> i32 {
         unsafe {

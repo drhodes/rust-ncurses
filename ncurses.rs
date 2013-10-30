@@ -7,7 +7,6 @@ use std::libc::types::os::arch::c95::{ c_char, c_int, c_short, c_long};
 use std::libc::types::common::c95::{ c_void, FILE};
 use std::c_str::ToCStr;
 
-
 use std::rt::io;
 use std::str;
 use t = types;
