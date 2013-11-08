@@ -1,6 +1,12 @@
-Bindings for ncurses (libncurses 5)
 
-In progress... (wow, ncurses is C macros all the way down (almost))
+for ncurses I'd recommend checking out jeaye's bindings:
+~~~
+https://github.com/jeaye/ncurses-rs
+~~~
 
-until then, here's a fork of apribadi/rust-termbox that works
-  https://github.com/drhodes/rust-termbox
+
+Also, a simpler alternative to ncurses is termbox written by nsf,
+here are some rust rust bindings for that
+~~~
+https://github.com/drhodes/rust-termbox
+~~~
